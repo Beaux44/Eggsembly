@@ -5,7 +5,7 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 |   Name   | Description |
 |:--------:|:-----------:|
 |   axe    |Stop execution.|
-| chicken  |Push the string "chicken" onto the stack._
+| chicken  |Push the string "chicken" onto the stack.|
 |   add    |Add two top stack values.|
 |   fox    |Subtract two top stack values.|
 | rooster  |Multiply two top stack values.|
