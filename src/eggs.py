@@ -31,7 +31,7 @@ else:
             if "*/" in LINE and INCOM == True:
                 INCOM = False
             elif not re.match(VALIDCODE, re.sub(SINGLELINECOMMENT, "", LINE)) and not INCOM:
-                print("Invalid command on line " + str(LINENUMBER + 1) + ":", rep(LINE))
+                print("Invalid command on line " + str(LINENUMBER + 1) + ":", repr(LINE))
                 break
         else:
             ops = {'axe': 0, 'chicken': 1, 'add': 2, 'fox': 3, 'rooster': 4, 'compare': 5, 'pick': 6, 'peck': 7, 'fr': 8, 'bbq': 9}
