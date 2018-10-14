@@ -17,9 +17,11 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 |   push   |Pushes the literal number n-10 onto the stack.|
 --------------------------------
 
+### Ideas for some things that could be done
 |        Todo        |
 |:------------------:|
 |      Functions     |
 |       Imports      |
 |Imports as Functions|
 |   Eggsembly Shell  |
+| Rewrite HelloWorld |
