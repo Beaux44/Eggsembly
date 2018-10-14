@@ -9,7 +9,7 @@ args = parser.parse_args()
 import re
 
 COMMENT = re.compile(
-    r"(?<![A-z0-9\ ])([\ \t]*//.*?\n)|([\ \t]*//.*?(?=\n))|(?<![A-z0-9\ ])([\ \t]*/\*.*?(?:(?=\*/)\*/|$)\n*)|([\ \t]*/\*.*?(?:(?=\*/)\*/|$))(?=\n*)|(?<![A-z0-9\ ])([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$)\n*)|([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$))(?=\n*)",
+    r"""(?<![A-z0-9\ ])([\ \t]*//.*?\n)|([\ \t]*//.*?(?=\n))|(?<![A-z0-9\ ])([\ \t]*/\*.*?(?:(?=\*/)\*/|$)\n*)|([\ \t]*/\*.*?(?:(?=\*/)\*/|$))(?=\n*)|(?<![A-z0-9\ ])([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$)\n*)|([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$))(?=\n*)""",
     re.S)
 FILE = open(args.file[0], "r")
 ENDTXT = re.sub(COMMENT, "", FILE.read())
@@ -18,12 +18,12 @@ INCOM = False
 if len(ENDTXT.strip()) == 0:
     print("\nEmpty file given:", args.file[0])
 else:
-    SINGLELINECOMMENT = re.compile(r"[\t\ ]*//.*", re.S)
+    SINGLELINECOMMENT = re.compile(r"[\t\ ]*//.*|[\t \ ]*/\*.*", re.S)
     VALIDCODE = re.compile(r"^((?:push\s\d+)|(?:axe|chicken|add|fox|rooster|compare|pick|peck|fr|bbq)|\n|)$")
     for LINENUMBER, LINE in enumerate(FILE):
         if "/*" in LINE and INCOM == False:
             INCOM = True
-        elif "*/" in LINE and INCOM == True:
+        if "*/" in LINE and INCOM == True:
             INCOM = False
         elif not re.match(VALIDCODE, re.sub(SINGLELINECOMMENT, "", LINE)) and not INCOM:
             print("Invalid command on line " + str(LINENUMBER + 1) + ":", LINE)
