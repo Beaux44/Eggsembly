@@ -1,3 +1,4 @@
+# All code in this file is from https://github.com/auscompgeek/chickenpie
 EXIT = 0
 CHICKEN = 1
 ADD = 2
