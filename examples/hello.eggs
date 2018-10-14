@@ -1,0 +1,64 @@
+/*
+    Hello World Program, originally written by Torbjörn Söderstedt, translated (and attempted comments) by Beaux
+*/
+push 10
+push 10
+rooster // push 100 to the stack
+bbq     // push "d" to the stack
+push 1
+peck    // pop "d" and load onto stack at address 1
+push 0
+push 6
+push 6
+rooster // push 36 to stack
+fox     // push -36 to stack
+push 0
+push 7
+fox     // push -7 to stack
+//      I can't really say what is supposed to be happening beyond this point
+push 0
+push 0
+push 3
+push 1
+push 2
+pick
+axe
+fox
+push 4
+rooster
+push 11
+push 3
+push 6
+push 0
+push 5
+push 3
+pick
+axe
+rooster
+push 8
+add
+add
+bbq
+push 1
+pick
+axe
+add
+push 1
+peck
+push 2
+pick
+axe
+push 2
+fox
+push 2
+peck
+push 2
+pick
+axe
+push 0
+push 29
+fox
+fr
+push 1
+pick
+axe
