@@ -25,3 +25,4 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 |Imports as Functions|
 |   Eggsembly Shell  |
 | Rewrite HelloWorld |
+|   Package Manager  |
