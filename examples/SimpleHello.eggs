@@ -1,0 +1,81 @@
+/*
+    Simple Hello World Program,
+    Written and commented by Beaux.
+
+    This Hello World program is much simpler than the
+    one originally written by Torbjörn Söderstedt, it
+    is very linear, and very logical. It simply, one
+    by one, pushes the required character to the
+    stack and adds it to the rest of the string.
+*/
+push 9
+push 8
+rooster // push 72 to stack
+bbq     // push "H" to stack
+push 10
+push 10
+rooster
+push 1
+add     // push 111 to stack
+bbq     // push "e" to stack
+add     // add two top stack values ("H" and "e") and push to stack
+push 10
+push 11
+rooster
+push 2
+fox     // push 108 to stack
+bbq     // push "l" to stack
+add     // add two top stack values ("He" and "l") and push to stack
+push 10
+push 11
+rooster
+push 2
+fox     // push 108 to stack
+bbq     // push "l" to stack
+add     // add two top stack values ("Hel" and "l") and push to stack
+push 10
+push 11
+rooster
+push 1
+add     // push 111 to stack
+bbq     // push "o" to stack
+add     // add two top stack values ("Hell" and "o") and push to stack
+push 8
+push 4
+rooster // push 32 to stack
+bbq     // push " " to stack
+add     // add two top stack values ("Hello" and " ") and push to stack
+push 10
+push 9
+rooster
+push 3
+fox
+bbq     // add two top stack values ("Hello " and "W") and push to stack
+add
+push 10
+push 11
+rooster
+push 1
+add
+bbq
+add     // add two top stack values ("Hello W" and "o") and push to stack
+push 10
+push 11
+rooster
+push 4
+add
+bbq
+add     // add two top stack values ("Hello Wo" and "r") and push to stack
+push 10
+push 11
+rooster
+push 2
+fox     // push 108 to stack
+bbq     // push "l" to stack
+add     // add two top stack values ("Hello Wor" and "l") and push to stack
+push 10
+push 10
+rooster
+bbq
+add     // add two top stack values ("Hello Worl" and "d") and push to stack
+axe     // exit
