@@ -18,11 +18,10 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 --------------------------------
 
 ### Ideas for some things that could be done
-|        Todo        |
-|:------------------:|
-|      Functions     |
-|       Imports      |
-|Imports as Functions|
-|   Eggsembly Shell  |
-| Rewrite HelloWorld |
-|   Package Manager  |
+|         Todo         |
+|:--------------------:|
+|       Functions      |
+|      ~~Imports~~     |
+|    Eggsembly Shell   |
+|~~Rewrite HelloWorld~~|
+|    Package Manager   |

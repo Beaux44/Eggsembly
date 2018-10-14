@@ -1,0 +1,34 @@
+/*
+    A re-worked Hello World utilising the new call functionality
+    written by Beaux.
+
+    This program is equivalent to the SimpleHello.eggs program,
+    except that it is now calling code to push letters;
+    this functionality can be expanded on very simply by
+    putting more complex bits of code in the called files.
+
+    Using the call functionality can be used to both simplify
+    code, and to simply add better semantics.
+*/
+call callhellolib.pushH
+call callhellolib.pushe
+add
+call callhellolib.pushl
+add
+call callhellolib.pushl
+add
+call callhellolib.pusho
+add
+call callhellolib.pushSpace
+add
+call callhellolib.pushW
+add
+call callhellolib.pusho
+add
+call callhellolib.pushr
+add
+call callhellolib.pushl
+add
+call callhellolib.pushd
+add
+axe

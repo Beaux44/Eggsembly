@@ -1,6 +1,8 @@
 import argparse
 
 parser = argparse.ArgumentParser(description="Take Eggsembly file (.eggs) and run it.")
+parser.add_argument("-t", "--transpile", type="str", default="",
+                    help="A file name. If specified, a Chicken file (.chkn) equivalent to the Eggsembly file given will be generated and saved instead.")
 parser.add_argument("file", metavar="F", type=str, nargs=1,
                     help="Eggsembly file to run.")
 
@@ -17,40 +19,24 @@ except FileNotFoundError:
     print(repr(args.file[0]), "does not exist.")
 else:
     FULLTXT = FILE.read()
-    ENDTXT = re.sub(COMMENT, "", FULLTXT)
+    ENDEGGS = re.sub(COMMENT, "", FULLTXT)
     INCOM = False
 
-    if len(ENDTXT.strip()) == 0:
+    if len(ENDEGGS.strip()) == 0:
         print("\nEmpty file given:", args.file[0])
     else:
-        SINGLELINECOMMENT = re.compile(r"[\t\ ]*//.*|[\t \ ]*/\*.*", re.S)
-        VALIDCODE = re.compile(r"^((?:push \d+)|(?:axe|chicken|add|fox|rooster|compare|pick|peck|fr|bbq)|\n|)$")
-        for LINENUMBER, LINE in enumerate(FULLTXT.split("\n")):
-            if "/*" in LINE and INCOM == False:
-                INCOM = True
-            if "*/" in LINE and INCOM == True:
-                INCOM = False
-            elif not re.match(VALIDCODE, re.sub(SINGLELINECOMMENT, "", LINE)) and not INCOM:
-                print("Invalid command on line " + str(LINENUMBER + 1) + ":", repr(LINE))
-                break
-        else:
-            ops = {'axe': 0, 'chicken': 1, 'add': 2, 'fox': 3, 'rooster': 4, 'compare': 5, 'pick': 6, 'peck': 7, 'fr': 8, 'bbq': 9}
-            PUSH = re.compile(r"^(?:push )([0-9]+)$")
-            ENDCHKN = ""
-            for LINE in ENDTXT.split("\n"):
-                if LINE != "":
-                    LINE = LINE.strip()
-                    if LINE in ops:
-                        ENDCHKN += ("chicken " * ops[LINE])[:-1] + "\n"
-                    else:
-                        N = re.match(PUSH, LINE)
-                        if not N:
-                            print("Something's mega wrong here, bud:", repr(LINE))
-                            break
-                        ENDCHKN += ("chicken " * (int(N[1]) + 10))[:-1] + "\n"
-            else:
-                from vm import Machine
-                VM = Machine(bbq_compat=False)
-                VM.load_str(ENDCHKN)
-                VM.load_input(input("Input: "))
-                print(VM.run())
+        import eggs2chkn
+        ROOT = "/".join(args.file[0].split("/")[:-1]) + "/"
+        if eggs2chkn.validate(FULLTXT, args.file[0], ROOT):
+            ENDCHKN = eggs2chkn.transpile(ENDEGGS, args.file[0], ROOT)
+            if ENDCHKN:
+                if args.transpile:
+                    CHKNFILE = open((args.transpile if args.transpile.endwith(".chkn") else args.transpile + ".chkn"), 'w')
+                    CHKNFILE.write(ENDCHKN)
+                    CHKNFILE.close()
+                else:
+                    from vm import Machine
+                    VM = Machine(bbq_compat=False)
+                    VM.load_str(ENDCHKN)
+                    VM.load_input(input("Input: "))
+                    print(VM.run())

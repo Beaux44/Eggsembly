@@ -50,8 +50,8 @@ push 9
 rooster
 push 3
 fox
-bbq     // add two top stack values ("Hello " and "W") and push to stack
-add
+bbq     // push "W" to stack
+add     // add two top stack values ("Hello " and "W") and push to stack
 push 10
 push 11
 rooster
