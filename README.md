@@ -2,6 +2,7 @@
 A multi-platform interpreter for the Eggsembly language, with comments added
 
 
+## Standard Eggsembly commands
 |   Name   | Description |
 |:--------:|:-----------:|
 |   axe    |Stop execution.|
@@ -15,9 +16,15 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 |    fr    |Top of stack is a relative offset to jump to. The value below that is the condition. Jump only happens if condition is truthy.|
 |   bbq    |Interprets the top of the stack as ascii and pushes the corresponding character.|
 |   push   |Pushes the literal number n-10 onto the stack.|
---------------------------------
+---
 
-### Ideas for some things that could be done
+## Non-standard Eggsembly commands
+| Name |                         Description                          |
+|:----:|:------------------------------------------------------------:|
+| call |Call Eggsembly code from another script, code is run at import|
+-----------------------------------------------------------------------
+
+## Ideas for some things that could be done
 |                       Todo                      |
 |:-----------------------------------------------:|
 |                    Functions                    |
