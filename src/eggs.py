@@ -1,9 +1,9 @@
 import argparse
 
 parser = argparse.ArgumentParser(description="Take Eggsembly file (.eggs) and run it.")
-parser.add_argument("-t", "--transpile", type=str, default="",
+parser.add_argument("-t", "--transpile", type=str, metavar="file", default="",
                     help="A file name. If specified, a Chicken file (.chkn) equivalent to the Eggsembly file given will be generated and saved instead.")
-parser.add_argument("file", metavar="F", type=str, nargs=1,
+parser.add_argument("file", metavar="file", type=str, nargs=1,
                     help="Eggsembly file to run.")
 
 args = parser.parse_args()
