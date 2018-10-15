@@ -1,4 +1,4 @@
-# Eggsembly 1.0
+# Eggsembly
 A multi-platform interpreter for the Eggsembly language, with comments added
 
 
@@ -18,10 +18,10 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 --------------------------------
 
 ### Ideas for some things that could be done
-|         Todo         |
-|:--------------------:|
-|       Functions      |
-|      ~~Imports~~     |
-|    Eggsembly Shell   |
-|~~Rewrite HelloWorld~~|
-|    Package Manager   |
+|                       Todo                      |
+|:-----------------------------------------------:|
+|                    Functions                    |
+|                   ~~Imports~~                   |
+|Eggsembly Shell (obviously to be called Eggshell)|
+|              ~~Rewrite HelloWorld~~             |
+|                 Package Manager                 |
