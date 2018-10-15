@@ -1,4 +1,4 @@
-# Eggsembly 1.0
+# Eggsembly
 A multi-platform interpreter for the Eggsembly language, with comments added
 
 
