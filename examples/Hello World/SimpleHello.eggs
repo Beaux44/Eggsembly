@@ -79,3 +79,10 @@ rooster
 bbq
 add     // add two top stack values ("Hello Worl" and "d") and push to stack
 axe     // exit
+/*
+    Note that the add commands littered throughout the program
+    could reasonably all be put at the end, but it would likely
+    be a bit more confusing. In fact, due to the stack-based
+    functionality of Chicken, this entire program could be
+    significantly re-ordered so that there's a single glob of
+    pushes and a single glob of roosters, foxes, adds, and bbqs

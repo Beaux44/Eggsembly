@@ -1,0 +1,50 @@
+push 1
+pick
+axe
+/*
+    I'll admit that the usage of this axe command here was confusing
+    me in the original Hello World program, as well. I have inspected
+    the Chicken interpreter that was written by auscompgeek - it's much
+    more understandable than the original by Torbjörn Söderstedt - for
+    a couple of hours and have come to understand how this functions.
+
+    I haven't played with it much, but each command has its own code -
+    axe's code is 0 - 0 says to load from the stack, it gets this 0
+    by getting the code of the next command, in this case, axe. The "push 1"
+    preceding it tells it what to index. Now, you may have noticed
+    that the specification says that 1 (chicken) will load from input,
+    so why can't I just use that? This is because that will actually
+    push input[1] to the stack. At the time of writing this, I haven't
+    written it yet, but this is what I plan to use in the reversecat.eggs
+    program.
+*/
+push 0
+fox
+/*
+    After inspecting auscompgeek's interpreter,  I found that subtracting
+    in JavaScript will coerce both operands to integers, I take advantage
+    of this here and use it to coerce the input to an integer, since doing
+    this isn't technically a native operation in Chicken.
+*/
+push 10
+rooster
+push 8
+push 4
+rooster
+bbq     // push a space to the stack, I could use the callhellolib here, but I don't want to copy it over for no reason
+push 1
+pick
+axe
+push 10
+rooster
+add
+add
+/*
+    Here, I perform the equivalent JavaScript operation of
+        String(ParseInt(input) * 10) + " " + input * 10
+    I noticed here, that you could also Javascript's add operation
+    to coerce an integer to a string, however, I haven't been able
+    to think of a way to do this without some other character appended
+    to the integer yet.
+*/
+axe

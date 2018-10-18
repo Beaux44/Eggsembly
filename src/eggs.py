@@ -23,7 +23,7 @@ else:
     INCOM = False
 
     if len(ENDEGGS.strip()) == 0:
-        print("\nEmpty file given:", args.file[0])
+        print("\nEmpty file given:", repr(args.file[0]))
     else:
         import eggs2chkn
         ROOT = "/".join(args.file[0].split("/")[:-1]) + "/"
@@ -31,12 +31,13 @@ else:
             ENDCHKN = eggs2chkn.transpile(ENDEGGS, args.file[0], ROOT)
             if ENDCHKN:
                 if args.transpile:
-                    CHKNFILE = open((args.transpile if args.transpile.endwith(".chkn") else args.transpile + ".chkn"), 'w')
+                    CHKNFILE = open((args.transpile if args.transpile.endswith(".chkn") else args.transpile + ".chkn"), 'w')
                     CHKNFILE.write(ENDCHKN)
                     CHKNFILE.close()
                 else:
                     from vm import Machine
-                    VM = Machine(bbq_compat=False)
+                    VM = Machine()
                     VM.load_str(ENDCHKN)
                     VM.load_input(input("Input: "))
                     print(VM.run())
+                    print(VM.stack)

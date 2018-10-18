@@ -1,0 +1,24 @@
+// Prints "Hello World" utilising the new ASCII library.
+// Written by Beaux
+call ASCII.upper.H
+call ASCII.lower.e
+add
+call ASCII.lower.l
+add
+call ASCII.lower.l
+add
+call ASCII.lower.o
+add
+call ASCII.symbol.space
+add
+call ASCII.upper.W
+add
+call ASCII.lower.o
+add
+call ASCII.lower.r
+add
+call ASCII.lower.l
+add
+call ASCII.lower.d
+add
+axe

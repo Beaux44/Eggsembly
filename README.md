@@ -32,3 +32,4 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 |Eggsembly Shell (obviously to be called Eggshell)|
 |              ~~Rewrite HelloWorld~~             |
 |                 Package Manager                 |
+|                 String Literals                 |
