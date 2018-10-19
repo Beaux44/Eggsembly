@@ -66,7 +66,7 @@ def transpile(CODE, FILENAME, ROOT):
                                 ENDCHKN += CALLCHKN
                 else:
                     if "\"" in LINE or "'" in LINE:
-                        LINE = LINE[5:].strip("\"\'")
+                        LINE = N[1].strip("\"\'")
                         for x, i in enumerate(LINE):
                             if i in symbolNames.keys():
                                 ENDCHKN += transpile("call ASCII.symbol." + symbolNames[i], FILENAME, ROOT)
@@ -76,11 +76,14 @@ def transpile(CODE, FILENAME, ROOT):
                                 else:
                                     ENDCHKN += transpile("call ASCII.lower." + i, FILENAME, ROOT)
                             else:
-                                ENDCHKN += transpile("call ASCCI." + i, FILENAME, ROOT)
+                                ENDCHKN += transpile("call ASCII." + i, FILENAME, ROOT)
                             if x > 0:
                                 ENDCHKN += "chicken chicken\n"
                     else:
-                        ENDCHKN += ("chicken " * (int(N[1]) + 10))[:-1] + "\n"
+                        if int(N[1]) < 0:
+                            ENDCHKN += transpile("push 0\npush %s\nfox\n" % N[1], FILENAME, ROOT)
+                        else:
+                            ENDCHKN += ("chicken " * (int(N[1]) + 10))[:-1] + "\n"
     else:
         return ENDCHKN.lstrip("\n")
     return ""
