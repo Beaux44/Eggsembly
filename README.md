@@ -15,13 +15,14 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 |   peck   |Top of stack points to address/index to store to. The value below that will be popped and stored.|
 |    fr    |Top of stack is a relative offset to jump to. The value below that is the condition. Jump only happens if condition is truthy.|
 |   bbq    |Interprets the top of the stack as ascii and pushes the corresponding character.|
-|   push   |Pushes the literal number n-10 onto the stack.|
+|  push n  |Pushes the literal number n onto the stack.|
 ---
 
 ## Non-standard Eggsembly commands
 | Name |                         Description                          |
 |:----:|:------------------------------------------------------------:|
 | call |Call Eggsembly code from another script, code is run at import|
+|push x|   Pushes x onto the stack, x is either a string or integer   |
 -----------------------------------------------------------------------
 
 ## Ideas for some things that could be done
