@@ -40,4 +40,3 @@ else:
                     VM.load_str(ENDCHKN)
                     VM.load_input(input("Input: "))
                     print(VM.run())
-                    print(VM.stack)

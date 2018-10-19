@@ -1,7 +1,41 @@
 import re, inspect, os.path
 ops = {'axe': 0, 'chicken': 1, 'add': 2, 'fox': 3, 'rooster': 4, 'compare': 5, 'pick': 6, 'peck': 7, 'fr': 8, 'bbq': 9}
-PUSH = re.compile(r"^(?:push )([0-9]+)$")
-CALL = re.compile(r"^(?:call )([A-z0-9\.])")
+symbolNames = {'&': 'ampersand',
+                "'": 'apostrophe',
+                '*': 'asterisk',
+                '@': 'at',
+                '\\': 'backSlash',
+                '|': 'bar',
+                '{': 'beginBrace',
+                '[': 'beginBracket',
+                '(': 'beginParenthesis',
+                '^': 'caret',
+                ':': 'colon',
+                ',': 'comma',
+                '$': 'dollar',
+                '}': 'endBrace',
+                ']': 'endBracket',
+                ')': 'endParenthesis',
+                '=': 'equals',
+                '!': 'exclamation',
+                '>': 'greaterThan',
+                '#': 'hash',
+                '<': 'lessThan',
+                '-': 'minus',
+                '%': 'percent',
+                '.': 'period',
+                '+': 'plus',
+                '?': 'question',
+                '"': 'quotation',
+                ';': 'semicolon',
+                '/': 'Slash',
+                ' ': 'space',
+                '`': 'tick',
+                '~': 'tilde',
+                '_': 'underScore'
+}
+PUSH = re.compile(r"^(?:push )([0-9]+|(?:\'|\")[A-z0-9~`!@#$%^&*\(\)_+=|\\\{\}\[\]:;'<>,.?\/ ]*(?:\'|\"))$")
+CALL = re.compile(r"^(?:call )([A-z0-9\.]+)$")
 COMMENT = re.compile(
     r"""(?<![A-z0-9\ ])([\ \t]*//.*?\n)|([\ \t]*//.*?(?=\n))|(?<![A-z0-9\ ])([\ \t]*/\*.*?(?:(?=\*/)\*/|$)\n*)|([\ \t]*/\*.*?(?:(?=\*/)\*/|$))(?=\n*)|(?<![A-z0-9\ ])([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$)\n*)|([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$))(?=\n*)""",
     re.S)
@@ -31,14 +65,29 @@ def transpile(CODE, FILENAME, ROOT):
                                 CALLCHKN = transpile(re.sub(COMMENT, "", CALLFILE.read()), CALLNAME, ROOT)
                                 ENDCHKN += CALLCHKN
                 else:
-                    ENDCHKN += ("chicken " * (int(N[1]) + 10))[:-1] + "\n"
+                    if "\"" in LINE or "'" in LINE:
+                        LINE = LINE[5:].strip("\"\'")
+                        for x, i in enumerate(LINE):
+                            if i in symbolNames.keys():
+                                ENDCHKN += transpile("call ASCII.symbol." + symbolNames[i], FILENAME, ROOT)
+                            elif i.lower() in "abcdefghijklmnopqrstuvwxyz":
+                                if i.isupper():
+                                    ENDCHKN += transpile("call ASCII.upper." + i, FILENAME, ROOT)
+                                else:
+                                    ENDCHKN += transpile("call ASCII.lower." + i, FILENAME, ROOT)
+                            else:
+                                ENDCHKN += transpile("call ASCCI." + i, FILENAME, ROOT)
+                            if x > 0:
+                                ENDCHKN += "chicken chicken\n"
+                    else:
+                        ENDCHKN += ("chicken " * (int(N[1]) + 10))[:-1] + "\n"
     else:
         return ENDCHKN.lstrip("\n")
     return ""
 
 
 SINGLELINECOMMENT = re.compile(r"[\t\ ]*//.*|[\t \ ]*/\*.*", re.S)
-VALIDCODE = re.compile(r"^((?:push \d+)|(?:call [A-z0-9_\.]+)|(?:axe|chicken|add|fox|rooster|compare|pick|peck|fr|bbq)|\n|)$")
+VALIDCODE = re.compile(r"^((?:push (?:[+-]?\d+|(?:\'|\")[A-z0-9~`!@#$%^&*\(\)_+=|\\\{\}\[\]:;'<>,.?\/ ]*(?:\'|\")))|(?:call [A-z0-9_\.]+)|(?:axe|chicken|add|fox|rooster|compare|pick|peck|fr|bbq)|\n|)$")
 def validate(CODE, FILENAME, ROOT):
     INCOM = False
     for LINENUMBER, LINE in enumerate(CODE.split("\n"), 1):

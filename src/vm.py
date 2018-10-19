@@ -1,4 +1,12 @@
 # All code in this file is from https://github.com/auscompgeek/chickenpie
+# The only modifications I plan to make to this file are to better emulate
+# all the Javascript functionality and nuances as to better emulate the
+# original Chicken interpreter, and to handle Python errors such as
+# IndexError more like Javascript would. (where Python would raise an
+# IndexError, Javascript would simply return undefined)
+
+import re
+
 EXIT = 0
 CHICKEN = 1
 ADD = 2
@@ -106,12 +114,18 @@ class Machine(object):
             a, b = self.pop(), self.pop()
 
             # JavaScript's - operator coerces both operands to numbers
-            if isinstance(b, str):
-                b = int(b)
-            if isinstance(a, str):
-                a = int(a)
 
-            self.push(b - a)
+            if isinstance(b, str):
+                b = intify(b)
+            if isinstance(a, str):
+                a = intify(a)
+
+            # when JavaScript's ParseInt function fails to coerce the
+            # string to an integer, it will return NaN, instead.
+            if a == "NaN" or b == "NaN":
+                self.push("NaN")
+            else:
+                self.push(b - a)
 
         elif opcode == ROOSTER:
             a, b = self.pop(), self.pop()
@@ -125,15 +139,20 @@ class Machine(object):
             if where == 1:
                 source = self.get_input()
             else:
-                source = self.stack[where]
+                try:
+                    source = self.stack[where]
+                except IndexError:
+                    source = "undefined"
             addr = self.pop()
 
             #self.push(source[addr])
             try:
                 if source is self.stack and addr == 1:
                     self.push(self.get_input())
-                else:
+                elif source != "undefined":
                     self.push(source[addr])
+                else:
+                    self.push(source)
             except (IndexError, TypeError):
                 self.push(None)
 
@@ -151,7 +170,13 @@ class Machine(object):
             if self.bbq_compat:
                 self.push('&#{};'.format(v))
             else:
-                self.push(chr(v))
+                if v == "NaN":
+                    self.push(" ")
+                else:
+                    try:
+                        self.push(chr(v))
+                    except TypeError:
+                        print("RuntimeError: %s cannot be BBQ'd" % (repr(v)))
 
         else:
             self.push(opcode - 10)
@@ -168,7 +193,6 @@ class Machine(object):
 
         out = self.look()
         if self.bbq_compat and isinstance(out, str) and '&#' in out:
-            import re
             out = re.sub(r'&#(\d+);', lambda m: chr(int(m.group(1))), out)
 
         return out
@@ -231,10 +255,13 @@ class Machine(object):
     def run(self):
         """Execute the loaded Chicken program."""
 
-        while self.step():
-            pass
-
-        return self.get_output()
+        try:
+            while self.step():
+                pass
+        except Exception as e:
+            print("Exception on line %d: %s" % (self.ip, e.__class__.__name__))
+        finally:
+            return self.get_output()
 
     def set(self, addr, value):
         l = len(self.stack)
@@ -267,3 +294,10 @@ def stringify(o):
     if o is None:
         return 'undefined'
     return str(o)
+
+INTEGER = re.compile(r"\s*([+-]?\d+)\s*")
+def intify(o):
+    if re.match(INTEGER, o):
+        return int(o)
+    else:
+        return "NaN"
