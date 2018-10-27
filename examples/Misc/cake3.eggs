@@ -1,0 +1,105 @@
+/*
+    This is from
+        https://codegolf.stackexchange.com/questions/174709/bake-me-a-slice-of-cake
+    I spent some time making it, I originally made it in a very simple manner, by simply pushing
+    the string. After trying to make a version that was shorter in Chicken, I realized the usefulness
+    of the pick and peck commands, and then I realized their annoying length. So I decided to create
+    variables, since it wasn't particularly difficult. I've reworked it here from the version shown
+    on the page to use variables.
+*/
+push " "
+push 4
+rooster
+space4[4] = Top
+push '.-""-.\n'
+add
+push ' .-"'
+space4
+push " "
+push 2
+rooster
+add
+space6[6] = Top
+add
+push '"-.\n'
+add
+push '|'
+X[2] = '""--..'
+// This will not be pushed to the stack, it must be called, as I do just below.
+X
+add
+add
+space6
+add
+push '"-.\n'
+add
+push '|'
+add
+space6
+add
+X
+add
+push " "
+push 3
+rooster
+add
+push '"-.\n'
+add
+push '|'
+add
+X
+add
+space6
+add
+X
+add
+push '\\n'
+add
+push '|'
+add
+space6
+add
+X
+add
+space6
+add
+push '|\n'
+add
+push '|'
+add
+space6
+space6
+add
+space12[3] = Top
+add
+X
+add
+push '|\n'
+add
+push " "
+add
+X
+add
+space12
+add
+push '|\n'
+add
+space6
+push " "
+add
+add
+X
+add
+space6
+add
+push '|\n'
+add
+space12
+add
+push " "
+add
+X
+add
+push '|\n'
+add
+add

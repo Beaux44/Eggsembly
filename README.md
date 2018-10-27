@@ -35,3 +35,4 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 |                 Package Manager                 |
 |               ~~String Literals~~               |
 |                     Division                    |
+|                   ~~Variables~~                 |

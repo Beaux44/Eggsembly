@@ -1,6 +1,6 @@
-push 10
-push 5
+push 7
+push 7
 rooster
-push 5
+push 4
 add
 bbq
