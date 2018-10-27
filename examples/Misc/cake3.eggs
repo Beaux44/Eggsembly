@@ -11,6 +11,7 @@ push " "
 push 4
 rooster
 space4[4] = Top
+space4
 push '.-""-.\n'
 add
 push ' .-"'
@@ -20,12 +21,12 @@ push 2
 rooster
 add
 space6[6] = Top
+space6
 add
 push '"-.\n'
 add
 push '|'
 X[2] = '""--..'
-// This will not be pushed to the stack, it must be called, as I do just below.
 X
 add
 add
@@ -71,6 +72,7 @@ space6
 space6
 add
 space12[3] = Top
+space12
 add
 X
 add
