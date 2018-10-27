@@ -42,12 +42,10 @@ def parse(prog):
     prog = prog.split('\n')
 
     for i, line in enumerate(prog, 1):
-        count = 0
         for j, word in enumerate(line.split(), 1):
             if word != 'chicken':
                 raise SyntaxError('line %d word %d: expected "chicken", found "%s"' % (i, j, word))
-            count += 1
-        OPs.append(count)
+        OPs.append(j - 1)
 
     return OPs
 
@@ -116,9 +114,9 @@ class Machine(object):
             # JavaScript's - operator coerces both operands to numbers
 
             if isinstance(b, str):
-                b = intify(b)
+                b = numberify(b)
             if isinstance(a, str):
-                a = intify(a)
+                a = numberify(a)
 
             # when JavaScript's ParseInt function fails to coerce the
             # string to an integer, it will return NaN, instead.
@@ -158,6 +156,9 @@ class Machine(object):
 
         elif opcode == PECK:
             addr = self.pop()
+            if addr == None:
+                print("RuntimeError: attempt to index None address")
+                return
             self.set(addr, self.pop())
 
         elif opcode == FR:
@@ -255,13 +256,13 @@ class Machine(object):
     def run(self):
         """Execute the loaded Chicken program."""
 
-        try:
-            while self.step():
-                pass
-        except Exception as e:
-            print("Exception on line %d: %s" % (self.ip, e.__class__.__name__))
-        finally:
-            return self.get_output()
+        # try:
+        while self.step():
+            pass
+        # except Exception as e:
+        #     print("Exception on line %d: %s" % (self.ip, e.__class__.__name__))
+        # finally:
+        return self.get_output()
 
     def set(self, addr, value):
         l = len(self.stack)
@@ -296,8 +297,11 @@ def stringify(o):
     return str(o)
 
 INTEGER = re.compile(r"\s*([+-]?\d+)\s*")
-def intify(o):
+FLOAT = re.compile(r"\s*([+-]?(?:\d+\.\d*|\d*\.\d+))")
+def numberify(o):
     if re.match(INTEGER, o):
         return int(o)
+    elif re.match(FLOAT, 0):
+        return float(o)
     else:
         return "NaN"

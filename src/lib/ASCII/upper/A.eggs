@@ -1,4 +1,6 @@
 push 9
 push 7
 rooster
+push 2
+add
 bbq

@@ -32,16 +32,21 @@ symbolNames = {'&': 'ampersand',
                 ' ': 'space',
                 '`': 'tick',
                 '~': 'tilde',
-                '_': 'underScore'
+                '_': 'underScore',
+                '\r': 'CR',
+                '\n': 'LF'
 }
-PUSH = re.compile(r"^(?:push )([0-9]+|(?:\'|\")[A-z0-9~`!@#$%^&*\(\)_+=|\\\{\}\[\]:;'<>,.?\/ ]*(?:\'|\"))$")
-CALL = re.compile(r"^(?:call )([A-z0-9\.]+)$")
+PUSH = re.compile(r"""^(?:push )((?:\d+|\d*\.\d*)|(?P<quote>'|")(?P<str>[ -~]*?)(?P=quote))$""")
+PICK = re.compile(r"^(?:pick )(\d+)$")
+CALL = re.compile(r"^(?:call )([A-Za-z0-9\.]+)$")
 COMMENT = re.compile(
-    r"""(?<![A-z0-9\ ])([\ \t]*//.*?\n)|([\ \t]*//.*?(?=\n))|(?<![A-z0-9\ ])([\ \t]*/\*.*?(?:(?=\*/)\*/|$)\n*)|([\ \t]*/\*.*?(?:(?=\*/)\*/|$))(?=\n*)|(?<![A-z0-9\ ])([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$)\n*)|([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$))(?=\n*)""",
+    r"(?<![A-z0-9\ ])([\ \t]*//.*?\n)|([\ \t]*//.*?(?=\n))|(?<![A-z0-9\ ])([\ \t]*/\*.*?(?:(?=\*/)\*/|$)\n*)|([\ \t]*/\*.*?(?:(?=\*/)\*/|$))(?=\n*)|(?<![A-z0-9\ ])([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$)\n*)|([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$))(?=\n*)",
     re.S)
+VARIABLE = re.compile(r"^(?:(?P<name>[A-Za-z0-9_]+)(?:\[(?P<index>\d+)\])?(?:\s*?=\s*?(?P<value>Top|(?P<assquote>'|\")[ -~]+(?P=assquote)|\d+))?)$")
+VARS = {}
 def transpile(CODE, FILENAME, ROOT):
     ENDCHKN = ""
-    for LINE in CODE.split("\n"):
+    for LINENUMBER, LINE in enumerate(CODE.split("\n"), 1):
         if LINE != "":
             LINE = LINE.strip()
             if LINE in ops:
@@ -51,8 +56,34 @@ def transpile(CODE, FILENAME, ROOT):
                 if not N:
                     X = re.match(CALL, LINE)
                     if not X:
-                        print("Something's mega wrong here, bud:\n\tIn file %s\n\t\t%s" % (repr(FILENAME), repr(LINE)))
-                        break
+                        Y = re.match(VARIABLE, LINE)
+                        if not Y:
+                            Z = re.match(PICK, LINE)
+                            if not Z:
+                                    print("Something's mega wrong here, bud:\n\tOn line %d of file %s\n\t\t%s" % (LINENUMBER, repr(FILENAME), repr(LINE)))
+                                    break
+                            else:
+                                ENDCHKN += transpile("push %s\npick" % Z[1], FILENAME, ROOT)
+                        else:
+                            name = Y["name"]
+                            index = Y["index"]
+                            value = Y["value"]
+                            if index != None:
+                                index = int(index)
+                                VARS[name] = index
+
+                            if name not in VARS and index == None:
+                                print("Variable %r not defined on line %d in file %r" % (name, LINENUMBER, FILENAME))
+                                break
+                            elif value == None and value != "Top":
+                                if index != None:
+                                    ENDCHKN += transpile("pick %d\naxe" % index, FILENAME, ROOT)
+                                else:
+                                    ENDCHKN += transpile("pick %d\naxe" % VARS[name], FILENAME, ROOT)
+                            elif value == "Top":
+                                ENDCHKN += transpile("push %d\npeck" % (VARS[name]), FILENAME, ROOT)
+                            else:
+                                ENDCHKN += transpile("push %s\npush %d\npeck" % (value, VARS[name]), FILENAME, ROOT)
                     else:
                         CALLNAME = LINE.split()[-1].replace(".", "\\") + ".eggs"
                         LIBFILE = "\\".join(inspect.getfile(inspect.currentframe()).split("\\")[:-1]) + "\\lib\\" + CALLNAME
@@ -65,8 +96,10 @@ def transpile(CODE, FILENAME, ROOT):
                                 CALLCHKN = transpile(re.sub(COMMENT, "", CALLFILE.read()), CALLNAME, ROOT)
                                 ENDCHKN += CALLCHKN
                 else:
-                    if "\"" in LINE or "'" in LINE:
-                        LINE = N[1].strip("\"\'")
+                    if '"' in LINE or "'" in LINE:
+                        LINE = N["str"]
+                        LINE = LINE.replace("\\r", "")
+                        LINE = LINE.replace("\\n", "\n")
                         for x, i in enumerate(LINE):
                             if i in symbolNames.keys():
                                 ENDCHKN += transpile("call ASCII.symbol." + symbolNames[i], FILENAME, ROOT)
@@ -80,19 +113,23 @@ def transpile(CODE, FILENAME, ROOT):
                             if x > 0:
                                 ENDCHKN += "chicken chicken\n"
                     else:
-                        if int(N[1]) < 0:
-                            ENDCHKN += transpile("push 0\npush %s\nfox\n" % N[1], FILENAME, ROOT)
-                        else:
-                            ENDCHKN += ("chicken " * (int(N[1]) + 10))[:-1] + "\n"
+                        try:
+                            if int(N[1]) < 0:
+                                ENDCHKN += transpile("push 0\npush %s\nfox\n" % N[1], FILENAME, ROOT)
+                            else:
+                                ENDCHKN += ("chicken " * (int(N[1]) + 10))[:-1] + "\n"
+                        except:
+                            ENDCHKN += transpile('push "%s"\npush 0\nfox' % N[1], FILENAME, ROOT)
     else:
         return ENDCHKN.lstrip("\n")
     return ""
 
 
-SINGLELINECOMMENT = re.compile(r"[\t\ ]*//.*|[\t \ ]*/\*.*", re.S)
-VALIDCODE = re.compile(r"^((?:push (?:[+-]?\d+|(?:\'|\")[A-z0-9~`!@#$%^&*\(\)_+=|\\\{\}\[\]:;'<>,.?\/ ]*(?:\'|\")))|(?:call [A-z0-9_\.]+)|(?:axe|chicken|add|fox|rooster|compare|pick|peck|fr|bbq)|\n|)$")
+SINGLELINECOMMENT = re.compile(r"[\t ]*//.*|[\t ]*/\*.*", re.S)
+VALIDCODE = re.compile(r"^(?:push (?:(?:[+-]?\d+|(?:[+-]?\d+\.\d*|[+-]?\d*\.\d+))|(?P<quote>'|\")[ -~]+(?P=quote))|(?:pick \d+)|(?:call [A-Za-z0-9_\.]+)|(?:[A-Za-z_][A-Za-z0-9_]*?(?:\[\d+\])?(?:\s*?=\s*?(?:Top|(?P<assquote>'|\")[ -~]+(?P=assquote)|[0-9]+))?)|\n|)$")
 def validate(CODE, FILENAME, ROOT):
     INCOM = False
+    INSTR = False
     for LINENUMBER, LINE in enumerate(CODE.split("\n"), 1):
         if re.match(CALL, LINE):
 
@@ -107,7 +144,7 @@ def validate(CODE, FILENAME, ROOT):
                     print("%s does not exist, called on line %d:\n\t%s" % (repr(CALLNAME), LINENUMBER, LINE))
                     return False
 
-        elif not re.match(VALIDCODE, re.sub(SINGLELINECOMMENT, "", LINE)) and not INCOM:
+        elif not re.match(VALIDCODE, re.sub(SINGLELINECOMMENT, "", LINE)) and not (INCOM or INSTR):
             print("Invalid command on line %d in file %s: %s" % (LINENUMBER, repr(FILENAME), repr(LINE)))
             return False
 
@@ -116,4 +153,12 @@ def validate(CODE, FILENAME, ROOT):
 
         if "*/" in LINE and INCOM == True:
             INCOM = False
+
+        if "\""*3 in LINE and INSTR == True:
+            INSTR = False
+
+        if "\""*3 in LINE and INSTR == False:
+            INSTR = True
+
+
     return True

@@ -31,12 +31,13 @@ else:
             ENDCHKN = eggs2chkn.transpile(ENDEGGS, args.file[0], ROOT)
             if ENDCHKN:
                 if args.transpile:
-                    CHKNFILE = open((args.transpile if args.transpile.endswith(".chkn") else args.transpile + ".chkn"), 'w')
+                    CHKNFILE = open(args.transpile + [".chkn", ""][args.transpile.endswith(".chkn")], 'w')
                     CHKNFILE.write(ENDCHKN)
                     CHKNFILE.close()
                 else:
                     from vm import Machine
-                    VM = Machine()
+                    VM = Machine(bbq_compat=False)
                     VM.load_str(ENDCHKN)
                     VM.load_input(input("Input: "))
                     print(VM.run())
+                    print(VM.stack)
