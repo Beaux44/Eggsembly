@@ -19,11 +19,12 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 ---
 
 ## Non-standard Eggsembly commands
-| Name |                         Description                          |
-|:----:|:------------------------------------------------------------:|
-| call |Call Eggsembly code from another script, code is run at import|
-|push x|   Pushes x onto the stack, x is either a string or integer   |
------------------------------------------------------------------------
+|                  Name                     |                         Description                          |
+|:-----------------------------------------:|:------------------------------------------------------------:|
+|                   call                    |Call Eggsembly code from another script, code is run at import|
+|                  push x                   |   Pushes x onto the stack, x is either a string or integer   |
+|caseSensitiveVariable([n])(="string"|x|Top)|         assign or push caseSensitiveVariable to stack        |
+------------------------------------------------------------------------------------------------------------
 
 ## Ideas for some things that could be done
 |                       Todo                      |
