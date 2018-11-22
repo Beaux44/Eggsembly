@@ -32,9 +32,7 @@ add
 add
 space6
 add
-push '"-.\n'
-add
-push '|'
+push '"-.\n|'
 add
 space6
 add
@@ -44,9 +42,7 @@ push " "
 push 3
 rooster
 add
-push '"-.\n'
-add
-push '|'
+push '"-.\n|'
 add
 X
 add

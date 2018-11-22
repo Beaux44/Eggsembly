@@ -1,63 +1,45 @@
 /*
-    Hello World Program, originally written by Torbjörn Söderstedt, translated (and attempted comments) by Beaux
+    Hello World Program, originally written by Torbjörn Söderstedt, translated by Beaux
 */
-push 10
-push 10
-rooster // push 100 to the stack
-bbq     // push "d" to the stack
-push 1
-peck    // pop "d" and load onto stack at address 1
+push "d"
+str[1] = Top
 push 0
 push 6
 push 6
-rooster // push 36 to stack
-fox     // push -36 to stack
+rooster
+fox
 push 0
 push 7
-fox     // push -7 to stack
+fox
 push 0
 push 0
 push 3
 push 1
-push 2
-pick    // pop and push index 2 of
-axe     // stack to stack
-fox     // subtract top of stack from 1
+n[2]
+fox
 push 4
-rooster // multiply by 4
+rooster
 push 11
 push 3
 push 6
 push 0
 push 5
-push 3
-pick
-axe
+iDontKnowWhatThisActuallyIsAndItIsntUsedAnywhereElseSoItHasALongAndArbitraryNameNow[3]
 rooster
 push 8
 add
 add
 bbq
-push 1
-pick
-axe
+str
 add
-push 1
-peck
-push 2
-pick
-axe
+str = Top
+n
 push 2
 fox
-push 2
-peck
-push 2
-pick
-axe
+n = Top // Maybe work on some sort of -=, +=, and *= operators
+n
 push 0
 push 29
 fox
 fr
-push 1
-pick
-axe
+str

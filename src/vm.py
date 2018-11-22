@@ -5,7 +5,7 @@
 # IndexError more like Javascript would. (where Python would raise an
 # IndexError, Javascript would simply return undefined)
 
-import re
+import re, time
 
 EXIT = 0
 CHICKEN = 1
@@ -18,36 +18,29 @@ PECK = STORE = 7
 FR = JUMP = 8
 BBQ = CHAR = 9
 
-names = {
-    0: 'exit',
-    1: 'chicken',
-    2: 'add',
-    3: 'fox',
-    4: 'rooster',
-    5: 'compare',
-    6: 'pick',
-    7: 'peck',
-    8: 'fr',
-    9: 'BBQ'
-}
-
+names = [
+    "exit",
+    "chicken",
+    "add",
+    "fox",
+    "rooster",
+    "compare",
+    "pick",
+    "peck",
+    "fr",
+    "BBQ"
+]
 
 def get_name(opcode):
-    return names[opcode] if opcode in names else 'push %d' % (opcode - 10)
+    return names[opcode] if opcode < 10 else 'push %d' % (opcode - 10)
 
 def parse(prog):
     """Parse a Chicken program into bytecode."""
 
     OPs = []
     prog = prog.split('\n')
-
-    for i, line in enumerate(prog, 1):
-        count = 0
-        for j, word in enumerate(line.split(), 1):
-            if word != 'chicken':
-                raise SyntaxError('line %d word %d: expected "chicken", found "%s"' % (i, j, word))
-            count += 1
-        OPs.append(count)
+    for line in prog:
+        OPs.append(line.count("chicken"))
 
     return OPs
 
@@ -166,16 +159,13 @@ class Machine(object):
 
         elif opcode == BBQ:
             v = self.pop()
-            if self.bbq_compat:
-                self.push('&#{};'.format(v))
+            if v == "NaN":
+                self.push(" ")
             else:
-                if v == "NaN":
-                    self.push(" ")
-                else:
-                    try:
-                        self.push(chr(v))
-                    except TypeError:
-                        print("RuntimeError: %s cannot be BBQ'd" % (repr(v)))
+                try:
+                    self.push(chr(v))
+                except TypeError:
+                    print("RuntimeError: %s cannot be BBQ'd" % (repr(v)))
 
         else:
             self.push(opcode - 10)
@@ -253,7 +243,6 @@ class Machine(object):
 
     def run(self):
         """Execute the loaded Chicken program."""
-
         try:
             while self.step():
                 pass

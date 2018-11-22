@@ -1,0 +1,4 @@
+push 2
+pick
+axe     // push 12 to stack
+        // Spoopy, right?
