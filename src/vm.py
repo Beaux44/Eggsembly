@@ -108,9 +108,9 @@ class Machine(object):
             # JavaScript's - operator coerces both operands to numbers
 
             if isinstance(b, str):
-                b = intify(b)
+                b = numberify(b)
             if isinstance(a, str):
-                a = intify(a)
+                a = numberify(a)
 
             # when JavaScript's ParseInt function fails to coerce the
             # string to an integer, it will return NaN, instead.
@@ -248,6 +248,7 @@ class Machine(object):
                 pass
         except Exception as e:
             print("Exception on line %d: %s" % (self.ip, e.__class__.__name__))
+            print(self.stack[self.sp - 1], self.stack[self.sp], self.stack[self.sp + 1])
         finally:
             return self.get_output()
 
@@ -283,8 +284,11 @@ def stringify(o):
     return str(o)
 
 INTEGER = re.compile(r"\s*([+-]?\d+)\s*")
-def intify(o):
-    if re.match(INTEGER, o):
+def numberify(o):
+    try:
         return int(o)
-    else:
-        return "NaN"
+    except:
+        try:
+            return float(o)
+        except:
+            return "NaN"
