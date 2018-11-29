@@ -1,5 +1,11 @@
 sandwich as potato
 sandwich as potat
+proc Hello_Spaghetti {
+    push "gimme spaghet"
+}
+proc noSpaghet {
+    push "no spaghetts 4 u"
+}
 potato[1]
 Potato[2]
 nom[3]
@@ -9,6 +15,7 @@ NootNoot
 HeyMate[5]
 HelloSandwich[4]
 HelloWorld[6] = "Hello World!"
+cluck spaghet
 HelloMate
 gimmepotasplz
 gimmepotasplz[2]

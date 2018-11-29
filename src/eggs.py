@@ -55,11 +55,10 @@ else:
             #             import os.path, inspect
             #             os.system("./" + "\\".join(inspect.getfile(inspect.currentframe()).split("/")[:-1]) + "/chkc %r %r" % (fileName, inp))
             #             os.remove(fileName)
-            else:
-                if valid and ENDEGGS:
-                    from vm import Machine
-                    VM = Machine(bbq_compat=False)
-                    VM.load_str(ENDCHKN)
-                    VM.load_input(input("Input: "))
-                    print(VM.run())
-                    print(VM.stack)
+            elif valid:
+                from vm import Machine
+                VM = Machine(bbq_compat=False)
+                VM.load_str(ENDCHKN)
+                VM.load_input(input("Input: "))
+                print(VM.run())
+                # print(VM.stack)
