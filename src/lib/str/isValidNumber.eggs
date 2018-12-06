@@ -1,0 +1,5 @@
+push 0
+fox
+push "NaN"
+compare
+hatch bool.not

@@ -1,0 +1,7 @@
+input
+push 0
+fox
+push "0.5"
+push 0
+fox
+rooster

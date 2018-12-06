@@ -10,25 +10,25 @@
     Using the call functionality can be used to both simplify
     code, and to simply add better semantics.
 */
-call callhellolib.pushH
-call callhellolib.pushe
+hatch callhellolib.pushH
+hatch callhellolib.pushe
 add
-call callhellolib.pushl
+hatch callhellolib.pushl
 add
-call callhellolib.pushl
+hatch callhellolib.pushl
 add
-call callhellolib.pusho
+hatch callhellolib.pusho
 add
-call callhellolib.pushSpace
+hatch callhellolib.pushSpace
 add
-call callhellolib.pushW
+hatch callhellolib.pushW
 add
-call callhellolib.pusho
+hatch callhellolib.pusho
 add
-call callhellolib.pushr
+hatch callhellolib.pushr
 add
-call callhellolib.pushl
+hatch callhellolib.pushl
 add
-call callhellolib.pushd
+hatch callhellolib.pushd
 add
 axe

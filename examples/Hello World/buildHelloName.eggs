@@ -1,16 +1,11 @@
 world[2] = "World"
 
 // if `input` == "", "Hello, World!", else, Hello, `input`!
-proc helloName {
+build helloName {
     push "Hello, "
     input           // the variable `input` is automatically initialized at index 1
-    cluck str.isEmpty
-    cluck bool.not
-    /*
-        An idea:
-            iftrue{}
-            iffalse{}
-    */
+    hatch str.isEmpty
+    hatch bool.not
     push 4
     fr
     world
@@ -21,5 +16,5 @@ proc helloName {
     add             // `print("Hello, " + ("World" if input == "" else input) + "!")`
                     // in this case.
 }
-cluck helloName     /* cluck is used to specify a function call,
+hatch helloName     /* hatch is used to specify a function call,
                      can also be used to call code from separate files
