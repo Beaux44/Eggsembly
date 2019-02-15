@@ -1,0 +1,19 @@
+world[2] = "World"
+
+// if `input` == "", "Hello, World!", else, Hello, `input`!
+build buildHelloName {
+    push "Hello, "
+    input           // the variable `input` is automatically initialized at index 1
+    hatch str.isEmpty
+    hatch bool.not
+    push 4
+    fr
+    world
+    add
+    input           // the fr command on line 8 will skip to here.
+    add             // it works effectively as an if statement, since fr
+    push "!"        // only skips if the 2nd value on the stack is truthy; similar to
+    add             // `print("Hello, " + ("World" if input == "" else input) + "!")`
+                    // in this case.
+}
+hatch buildHelloName

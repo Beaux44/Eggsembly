@@ -30,6 +30,7 @@ else:
         ROOT = "/".join(args.file[0].split("/")[:-1]) + "/"
         valid = eggs2chkn.validate(ENDEGGS, args.file[0], ROOT)
         ENDCHKN = eggs2chkn.transpile(ENDEGGS, args.file[0], ROOT)
+        # print(ENDCHKN)
         if ENDCHKN:
             if args.transpile:
                 CHKNFILE = open(args.transpile + [".chkn", ""][args.transpile.endswith(".chkn")], 'w')

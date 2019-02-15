@@ -1,0 +1,5 @@
+// Switches the top 2 values on the stack
+__VAL_A = Top
+__VAL_B = Top
+__VAL_A
+__VAL_B

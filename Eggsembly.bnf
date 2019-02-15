@@ -1,0 +1,58 @@
+// BNF description of Eggsembly syntax
+// Still up for change, though
+
+<syntax>     ::=  <optionalWs> <line> | <syntax> <endline> <syntax>
+<line>       ::=  <keyword>
+                | <push>
+                | <hatch>
+                | <anychrs> <ws> "as" <ws> <anychrs>
+                | "build" <ws> <id> <optionalWs> "{" <endline> <syntax> "}"
+                | "repeat_" <woru>  <optionalWs> "{" <endline> <syntax> "}"
+                | "loop_"   <torf>  <optionalWs> "{" <endline> <syntax> "}"
+                | "if_"     <torf>  <optionalWs> "{" <endline> <syntax> "}"
+                | <var>
+                | <optionalWs>
+
+<endline>    ::= <optionalWs> <EOL> | <endline> <endline>
+<torf>       ::= "true"             | "false"
+<woru>       ::= "while"            | "until"
+<optionalWs> ::= " " <optionalWs>   | ""
+<ws>         ::= " " <ws>           | " "
+<id>         ::= <alunder>          | <id> <alnumunder>
+<func>       ::= <id>               | <func> "." <func>
+
+<letter>     ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M"
+               | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+               | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m"
+               | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+
+<digit>      ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+<symbol>     ::= "|" | " " | "!" | "#" | "$" | "%" | "&" | "("
+               | ")" | "*" | "+" | "," | "-" | "." | "/" | ":"
+               | ";" | ">" | "=" | "<" | "?" | "@" | "[" |"\\"
+               | "]" | "^" | "_" | "`" | "{" | "}" | "~"
+
+<alnum>      ::= <letter> | <digit>
+<alunder>    ::= <letter> | "_"
+<alnumunder> ::= <alnum>  | "_"
+<any>        ::= <letter> | <digit> | <symbol>
+<anychrs>    ::= <any>    | <anychrs> <any>
+<strchrs1>   ::= <any>    | "'"     | '\"'
+<strchrs2>   ::= <any>    | '"'     | "\'"
+<string1>    ::= <any>    | <strchrs1> <any>
+<string2>    ::= <any>    | <strchrs2> <any>
+
+<num>        ::= <num> <digit> | <digit>
+<keyword>    ::= "axe" | "chicken" | "add" | "fox" | "rooster" | "compare" | "pick" | "peck" | "fr" | "bbq"
+<str>        ::= '"' <string1> '"' | "'" <string2> "'"
+<val>        ::= <str> | <num>
+<push>       ::= "push"  <ws> <val>
+<hatch>      ::= "hatch" <ws> <func>
+
+<var>        ::= <id> <optionalWs> "[" <optionalWs> <num> <optionalWs> "]" <optionalWs> "=" <optionalWs> <val>
+               | <id> <optionalWs> "[" <optionalWs> <num> <optionalWs> "]" <optionalWs> "=" <optionalWs> "Top"
+               | <id> <optionalWs> "[" <optionalWs> <num> <optionalWs> "]"
+               | <id> <optionalWs> "=" <optionalWs> <val>
+               | <id> <optionalWs> "=" <optionalWs> "Top"
+               | <id>

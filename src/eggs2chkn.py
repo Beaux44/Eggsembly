@@ -140,20 +140,22 @@ names = [
         "BBQ"
     ]
 
-PUSH = re.compile(r"^[ \t]*push((?: \d+|\d*\.\d*)| ?(?P<quote>[\"'])(?P<str>(?:(?=(?P<slash>\\?))(?P=slash)[ -~])*?)(?P=quote))$")
-PICK = re.compile(r"^[ \t]*pick (\d+)$")
-PECK = re.compile(r"^[ \t]*peck (\d+)$")
-CALL = re.compile(r"^[ \t]*hatch ([A-Za-z0-9\.]+)$")
-COMMENT = re.compile(
+PUSH     = re.compile(r"^[ \t]*push((?: \d+|\d*\.\d*)| ?(?P<quote>[\"'])(?P<str>(?:(?=(?P<slash>\\?))(?P=slash)[ -~])*?)(?P=quote))$")
+PICK     = re.compile(r"^[ \t]*pick (\d+)$")
+PECK     = re.compile(r"^[ \t]*peck (\d+)$")
+CALL     = re.compile(r"^[ \t]*hatch ([A-Za-z0-9._]+)$")
+IF       = re.compile(r"^[ \t]*if(true|false)[ \t]*{$")
+ELSE     = re.compile(r"^[ \t]*}[ \t]*else[ \t]*{$")
+COMMENT  = re.compile(
     r"(?<![A-Za-z0-9\ \"\'{])([\ \t]*//.*\n?)|([\ \t]*//.*?(?=\n))|(?<![A-Za-z0-9\ \"\'{]])([\ \t]*/\*.*?(?:(?=\*/)\*/|$)\n*)|([\ \t]*/\*.*?(?:(?=\*/)\*/|$))(?=\n*)|(?<![A-Za-z0-9\ \"\'{])([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$)\n*)|([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$))(?=\n*)",
     re.S)
 VARIABLE = re.compile(r"^(?:(?P<name>[A-Za-z0-9_]+)(?:\[(?P<index>\d+)\])?(?:\s*?=\s*?(?P<value>Top|(?P<assquote>[\"'])(?P<str>(?:(?=(?P<slash>\\?))(?P=slash)[ -~])*?)(?P=assquote)|\d+))?)$") # "assquote" is short for assignment quote :3
-VARS     = {"input": 1}
+VARS     = {"stack": 0, "input": 1}
 MACRO    = re.compile(r"^(?P<replace>.+) +[Aa]s +(?P<replacement>.+)$", re.M)
 MACROS   = {}
-ROOST     = re.compile(r"build[ \t]+(?P<name>[A-Za-z_][A-Za-z0-9_]*)[ \t]*{")
-ROOSTN    = 0
-ROOSTS    = {}
+ROOST    = re.compile(r"build[ \t]+(?P<name>[A-Za-z_][A-Za-z0-9_]*)[ \t]*{")
+SKIP     = 0
+ROOSTS   = {}
 
 def fuzzyMatchesIn(a, l):
     matches = {}
@@ -163,27 +165,46 @@ def fuzzyMatchesIn(a, l):
         if m >= 0.5:
             matches[b] = m
     return ([*zip(*sorted(matches.items(), key=lambda kv: kv[1], reverse=True))] or [[]])[0]  # Sort suggestions by similarity
-                                                                                              # Like meh spook?
 
-def getProc(CODE, LINENUMBER, FILENAME, ROOT):
+def getBlock(CODE, FILENAME, ROOT, LINENUMBER):
     ENDCHKN = ""
+    ENDEGGS = ""
     n = 1
     while CODE.split("\n")[LINENUMBER] != "}":
-        ENDCHKN += transpile(CODE.split("\n")[LINENUMBER], FILENAME, ROOT, LINENUMBER+1)
+        ENDEGGS += CODE.split("\n")[LINENUMBER] + "\n"
         n += 1
         LINENUMBER += 1
-    return (n, ENDCHKN)
+
+    ENDCHKN += transpile(ENDEGGS, FILENAME, ROOT)
+    return n, ENDCHKN
+
+def getIfElse(CODE, FILENAME, ROOT, LINENUMBER):
+    IFBLOCK = ""
+    ELSEBLOCK = ""
+    a = 1
+    b = 0
+    LINE = CODE.split("\n")[LINENUMBER]
+    while LINE != "}":
+        LINE = CODE.split("\n")[LINENUMBER]
+        if re.match(ELSE, LINE):
+            b, ELSEBLOCK = getBlock(CODE, FILENAME, ROOT, LINENUMBER)
+            break
+        IFBLOCK += transpile(CODE.split("\n")[LINENUMBER], FILENAME, ROOT, LINENUMBER+1)
+        a += 1
+        LINENUMBER += 1
+    return (a, IFBLOCK), (b, ELSEBLOCK)
+
 
 def transpile(CODE, FILENAME, ROOT, LINEORIGIN=1):
-    global VARS, MACROS, ROOSTN, ROOSTS
+    global VARS, MACROS, SKIP, ROOSTS
     ENDCHKN = ""
     borken = False
     for LINENUMBER, LINE in enumerate(CODE.split("\n"), LINEORIGIN):
         if not re.match(MACRO, LINE):
             for M in MACROS:
                 LINE = LINE.replace(M, MACROS[M])
-        if ROOSTN:
-            ROOSTN -= 1
+        if SKIP:
+            SKIP -= 1
             continue
         if LINE != "":
             LINE = LINE.strip()
@@ -204,7 +225,29 @@ def transpile(CODE, FILENAME, ROOT, LINEORIGIN=1):
                                     if not Z:
                                         C = re.match(PECK, LINE)
                                         if not C:
-                                            borken = True
+                                            A = re.match(IF, LINE)
+                                            if not A:
+                                                pass
+                                                # borken = True
+                                            else:
+                                                IFELSE  = getIfElse(CODE, FILENAME, ROOT, LINENUMBER)
+                                                IFLEN   = len(IFELSE[0][1].split("\n"))
+                                                ELSELEN = len(IFELSE[1][1].split("\n"))
+                                                SKIP    = IFELSE[0][0] + IFELSE[1][0]
+
+                                                if A[1] == "true":
+                                                    ENDCHKN += transpile("hatch bool.not", FILENAME, ROOT)
+                                                print(IFELSE)
+                                                if ELSELEN:
+                                                    ENDCHKN += ("chicken " * (10 + IFLEN + 2))[:-1] + "\nchicken chicken chicken chicken chicken chicken chicken chicken\n"
+                                                    # ENDCHKN += transpile("push %d\nfr" % (IFLEN + 2), FILENAME, ROOT)
+                                                    ENDCHKN += IFELSE[0][1]
+                                                    # ENDCHKN += transpile("push 1\npush %d\nfr" % (ELSELEN - 1), FILENAME, ROOT)
+                                                    ENDCHKN += ("chicken " * 11)[:-1] + "\n" + ("chicken " * (9 + ELSELEN))[:-1] + "\n"
+                                                    ENDCHKN += IFELSE[1][1]
+                                                else:
+                                                    ENDCHKN += transpile("push %d\nfr" % IFLEN, FILENAME, ROOT)
+                                                    ENDCHKN += IFELSE[0][1]
                                         else:
                                             ENDCHKN += transpile("push %s\npeck" % C[1], FILENAME, ROOT)
                                     else:
@@ -214,29 +257,30 @@ def transpile(CODE, FILENAME, ROOT, LINEORIGIN=1):
                                     index = Y["index"]
                                     value = Y["value"]
                                     if name not in VARS and index == None or name in names:
-                                        cprint(ERROR, "\nError: Variable %r not defined on line %d in file %r" % (name, LINENUMBER, FILENAME))
-                                        suggestions = fuzzyMatchesIn(name, VARS)
-                                        if suggestions:
-                                            cprint(ERROR, "Alternate Suggestions:", *suggestions, sep="\n\t")
-                                        borken = True
+                                        # cprint(ERROR, "\nError: Cage %r not defined on line %d in file %r" % (name, LINENUMBER, FILENAME))
+                                        # suggestions = fuzzyMatchesIn(name, VARS)
+                                        # if suggestions:
+                                        #     cprint(ERROR, "Alternate Suggestions:", *suggestions, sep="\n\t")
+                                        # borken = True
+                                        VARS[name] = max([*zip(*VARS.items())][1]) + 1
 
-                                    if name in VARS and index != None:
-                                        cprint(WARNING, "\nWarning: Variable index of %r redefined on line %d, may have unexpected results." % (name, LINENUMBER))
+                                    if name in VARS and index != VARS[name] and index is not None:
+                                        cprint(WARNING, "\nWarning: Cage area of %r redefined on line %d, may have unexpected results." % (name, LINENUMBER))
 
                                     if index != None:
                                         index = int(index)
                                         VARS[name] = index
 
                                     if name in VARS.keys():
-                                        if value == None and index == None:                                     # caseSensitiveVariableName([x])
+                                        if value == None and index == None:                                     # caseSensitiveVariableName
                                             ENDCHKN += transpile("push %d\npick\naxe" % VARS[name], FILENAME, ROOT)
                                         elif value == "Top":                                                    # caseSensitiveVariableName([x]) = Top
                                             ENDCHKN += transpile("push %d\npeck" % (VARS[name]), FILENAME, ROOT)
                                         else:                                                                   # caseSensitiveVariableName([x]) = "anything else"
                                             ENDCHKN += transpile("push %s\npush %d\npeck" % (value, VARS[name]), FILENAME, ROOT)
                             else:
-                                procCode = getProc(CODE, LINENUMBER, FILENAME, ROOT)
-                                ROOSTN = procCode[0]
+                                procCode = getBlock(CODE, FILENAME, ROOT, LINENUMBER)
+                                SKIP = procCode[0]
                                 ROOSTS[B["name"]] = procCode[1]
                         else:
                             if W["replace"] in MACROS:
@@ -246,7 +290,6 @@ def transpile(CODE, FILENAME, ROOT, LINEORIGIN=1):
                                     W["replace"] + " as " + W["replacement"])
                                 )
                             MACROS[W["replace"]] = W["replacement"]
-
                     else:
                         if X[1] in ROOSTS:
                             ENDCHKN += ROOSTS[X[1]]
@@ -264,15 +307,16 @@ def transpile(CODE, FILENAME, ROOT, LINEORIGIN=1):
                                     ENDCHKN += CALLCHKN
                             except FileNotFoundError:
                                 borken = True
-                                cprint(ERROR, "\nError: Neither file %r nor function %r exists, called on line %d" % (ROOT + CALLNAME, X[1], LINENUMBER))
+                                cprint(ERROR, "\nError: Neither barn %r nor roost %r exists, called on line %d" % (ROOT + CALLNAME, X[1], LINENUMBER))
                                 suggestions = fuzzyMatchesIn(X[1], ROOSTS)
                                 if suggestions:
-                                    cprint(ERROR, "Alternate Function Suggestions:", *suggestions, sep="\n\t")
+                                    cprint(ERROR, "Alternate Roost Suggestions:", *suggestions, sep="\n\t")
                 else:
                     if '"' in LINE or "'" in LINE:
                         STRING = N["str"]
                         STRING = STRING.replace("\\r", "")
                         STRING = STRING.replace("\\n", "\n")
+                        STRING = STRING.replace("\\t", "\t")
                         STRING = re.sub(r"\\([ -~])", r"\1", STRING)
                         for x, i in enumerate(STRING):
                             ENDCHKN += transpile(symbolCodes[i], FILENAME, ROOT)
@@ -289,7 +333,7 @@ def transpile(CODE, FILENAME, ROOT, LINEORIGIN=1):
     return ENDCHKN.lstrip("\n") * (not borken)
 
 
-VALIDCODE = re.compile(r"^(?:(?:push[ \t]*(?:(?: [+-]?\d+| [+-]?(?:\d+\.\d*|\d*\.\d+))|(?P<quote>[\"'])(?:(?=(?P<slash>\\?))(?P=slash)[ -~])*?(?P=quote)))|^(?:pick \d+)$|^(?:hatch [A-Za-z0-9_\.]+)$|(?:[A-Za-z_][A-Za-z0-9_]*(?:\[\d+\])?(?:\s*?=\s*?(?:Top|(?P<assquote>[\"'])(?:(?=(?P<ASSslash>\\?))(?P=ASSslash)[ -~])*?(?P=assquote)|[0-9]+))?)|(?:[^ \t]+.+ +[Aa]s +.+)|\n|)$|^build[ \t]+[A-Za-z_][A-Za-z0-9_]*[ \t]*{[ \t]*$|^}$")
+VALIDCODE = re.compile(r"^(?:(?:push[ \t]*(?:(?: [+-]?\d+| [+-]?(?:\d+\.\d*|\d*\.\d+))|(?P<quote>[\"'])(?:(?=(?P<slash>\\?))(?P=slash)[ -~])*?(?P=quote)))|^(?:pick \d+)$|^(?:hatch [A-Za-z0-9_\.]+)$|(?:[A-Za-z_][A-Za-z0-9_]*(?:\[\d+\])?(?:\s*?=\s*?(?:Top|(?P<assquote>[\"'])(?:(?=(?P<ASSslash>\\?))(?P=ASSslash)[ -~])*?(?P=assquote)|[0-9]+))?)|(?:[^ \t]+.+ +[Aa]s +.+)|\n|build[ \t]+[A-Za-z_][A-Za-z0-9_]*[ \t]*{[ \t]*|^}|iftrue[ \t]*{|iffalse[ \t]*{|}[ \t]*else[ \t]*{|)$")
 def validate(CODE, FILENAME, ROOT):
     borken = False
     for LINENUMBER, LINE in enumerate(CODE.split("\n"), 1):
@@ -300,3 +344,4 @@ def validate(CODE, FILENAME, ROOT):
             borken = True
 
     return not borken
+
