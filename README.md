@@ -1,7 +1,7 @@
 # Eggsembly
 A multi-platform interpreter for the Eggsembly language, with comments added
 
-# Regular development temporarily on hiatus while I revamp parser
+# Regular development is temporarily on hiatus while I revamp parser
 
 ## Standard Eggsembly commands
 |    Name    |                                                                          Description                                                                           |
