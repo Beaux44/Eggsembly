@@ -1,31 +1,36 @@
-import ply.lex  as lex, \
-       ply.yacc as yacc
-import colorama
+import ply.lex  as lex, ply.yacc as yacc
 from pprint import pprint
-
 
 """
     TODO:
         Take OOP too far
         Make it do anything
         Come up with better while notation
-        Make blocks work
-        
 """
-
 
 nonExistentFileName = ""
 
-colorama.init()
+try:
+    import colorama
 
-WARNING = colorama.Fore.LIGHTYELLOW_EX
-ERROR = colorama.Fore.LIGHTRED_EX
+    colorama.init()
+
+    WARNING = colorama.Fore.LIGHTYELLOW_EX
+    ERROR = colorama.Fore.LIGHTRED_EX
 
 
-def cprint(color, *args, **kwargs):
-    print(end=color)
-    print(*args, **kwargs)
-    print(end=(colorama.Fore.RESET + colorama.Back.RESET))
+    def cprint(color, *args, **kwargs):
+        print(end=(color))
+        print(*args, **kwargs)
+        print(end=(colorama.Fore.RESET + colorama.Back.RESET))
+
+except ImportError:
+    WARNING = ""
+    ERROR = ""
+
+
+    def cprint(_, *args, **kwargs):
+        print(*args, **kwargs)
 
 
 class Command(object):
@@ -35,21 +40,44 @@ class Command(object):
         self.index = index
         self.value = value
 
-    def __str__(self):
+    def __repr__(self):
         return "Command(%r, %r, %r, %r)" % (self.type, self.ident, self.index, self.value)
 
-    __repr__ = __str__
+    def __str__(self):
+        if self.type in ["GET", "SET"]:
+            return (self.ident
+                    + ("[%s]" % str(self.index)) * (self.index is not None)
+                    + (" = " + str(self.value)) * (self.value is not None))
+        if self.type == "PUSH":
+            return "%s %s" % (self.type.lower(), self.value)
+        if self.type == "HATCH":
+            return "%s %s" % (self.type.lower(), self.ident)
+        if self.type in ["IF", "WHILE", "LOOP"]:
+            return "%s_%s" % (self.type.lower(), self.ident.lower())
+        return self.type.lower()
+
+    def __iter__(self):
+        yield self
 
 
 class Block(object):
     def __init__(self, type, code):
-        self.type = type
-        self.code = code
+        self.type: Command = type
+        self.code: list = code
 
-    def __str__(self):
+    def __repr__(self):
         return "Block(%r, code)" % self.type
 
-    __repr__ = __str__
+    def __str__(self):
+        if self.type.type == "BUILD":
+            return "build " + self.type.ident + " {\n" + '\n'.join(["\t" + str(i) for i in self.code]) + "\n}"
+        else:
+            return ("%s_%s {\n" % (self.type.type.lower(), self.type.ident.lower())
+                    + '\n'.join(["\t" + str(i) for i in self.code]) + "\n}")
+
+    def __iter__(self):
+        print(self.code)
+        return self.code.__iter__()
 
 
 class EggLex(object):
@@ -104,10 +132,12 @@ class EggLex(object):
         'hatch': 'HATCH',
         'build': 'BUILD',
         'Top': 'TOP',
-        'whiletrue': 'WHILET',
-        'whilefalse': 'WHILEF',
-        'iftrue': 'IFT',
-        'ifalse': 'IFF',
+        'loop_true': 'LOOPT',
+        'loop_false': 'LOOPF',
+        'repeat_true': 'REPT',
+        'repeat_false': 'REPF',
+        'if_true': 'IFT',
+        'if_alse': 'IFF',
     }
 
     tokens = ['INT',
@@ -115,6 +145,7 @@ class EggLex(object):
               'ID',
               'EQ',
               'DOT',
+              'FLOAT',
               'LPAREN',
               'LBRACE',
               'LBRACK',
@@ -124,9 +155,12 @@ class EggLex(object):
               'NEWLINE',
               ] + [*reserved.values()]
 
+    def t_ignore_COMMENT(self, t):
+        r'(//[^\n]*|/\*(?:.|\n)*?(?:\*/|\Z)|~~\[==(?:.|\n)*?(?:==\]~~/|\Z))'
+
     t_ignore = ' \t'
 
-    literals = "()[]{}.=\\"
+    literals = "()[]{}.="
     t_EQ = r'='
     t_DOT = r'\.'
     t_LPAREN = r'\('
@@ -143,9 +177,6 @@ class EggLex(object):
         t.value = t.value.count("\n")
         return t
 
-    def t_ignore_COMMENT(self, t):
-        r'(//[^\n]*|/\*(?:.|\n)*?(?:\*/|\Z)|~~\[==(?:.|\n)*?(?:==\]~~/|\Z))'
-
     def t_ID(self, t):
         r'\b([A-Za-z_][A-Za-z0-9_]*)\b'
         t.type = self.reserved.get(t.value, 'ID')
@@ -154,6 +185,11 @@ class EggLex(object):
     def t_INT(self, t):
         r'\b\d+\b'
         t.value = int(t.value)
+        return t
+
+    def t_FLOAT(self, t):
+        r'(?:\b\d+\.\d*|\d*\.\d+\b)'
+        t.value = float(t.value)
         return t
 
     t_STR = r'(?P<quote>["\'])(?P<str>(?:(?=(?P<slash>\\?))(?P=slash)[ -~])+?)(?P=quote)'
@@ -188,12 +224,14 @@ class EggParse(object):
         " \t"
 
     def p_error(self, p):
-        cprint(ERROR, "Syntax error on line %d:\n\t%s" % (self.lexer.lineno - 1,
-                                                          self.data.splitlines()[self.lexer.lineno - 2]))
+        cprint(ERROR, "Syntax error on line %d:\n\t%s" % (self.lexer.lineno,
+                                                          self.data.split("\n")[self.lexer.lineno - 1].strip()))
 
-    def p_expression_program(self, p):
-        """expressions : expressions NEWLINE expression
-                       | expression
+    def p_expressions_program(self, p):
+        """expressions : expressions NEWLINE block
+                       | expressions NEWLINE statement
+                       | block
+                       | statement
                        | NEWLINE
         """
         if len(p) == 4:
@@ -201,89 +239,109 @@ class EggParse(object):
         else:
             p[0] = p[1]
 
-    def p_expression_keyword(self, p):
-        """expression : AXE
-                      | CHICKEN
-                      | ADD
-                      | FOX
-                      | ROOSTER
-                      | COMPARE
-                      | PICK
-                      | PECK
-                      | FR
-                      | BBQ
+    def p_enter_block_build(self, p):
+        "enter : BUILD ID LBRACE"
+        p[0] = Command("BUILD", p[2])
+
+    def p_enter_block_loopt(self, p):
+        "enter : LOOPT LBRACE"
+        p[0] = Command("LOOP", "TRUE")
+
+    def p_enter_block_loopf(self, p):
+        "enter : LOOPF LBRACE"
+        p[0] = Command("LOOP", "FALSE")
+
+    def p_enter_block_rept(self, p):
+        "enter : REPT LBRACE"
+        p[0] = Command("REPEAT", "TRUE")
+
+    def p_enter_block_repf(self, p):
+        "enter : REPF LBRACE"
+        p[0] = Command("REPEAT", "FALSE")
+
+    def p_enter_block_ift(self, p):
+        "enter : IFT LBRACE"
+        p[0] = Command("IF", "TRUE")
+
+    def p_enter_block_iff(self, p):
+        "enter : IFF LBRACE"
+        p[0] = Command("IF", "FALSE")
+
+    def p_expression_block(self, p):
+        "block : enter NEWLINE expressions NEWLINE RBRACE"
+        p[0] = Block(p[1], p[3])
+
+    def p_statement_keyword(self, p):
+        """statement : AXE
+                     | CHICKEN
+                     | ADD
+                     | FOX
+                     | ROOSTER
+                     | COMPARE
+                     | PICK
+                     | PECK
+                     | FR
+                     | BBQ
         """
         p[0] = Command(p[1].upper())
 
-    def p_expression_SETVAR(self, p):
-        """expression : ID LBRACK INT RBRACK EQ val
-                      | ID EQ val
+    def p_statement_HATCH(self, p):
+        "statement : HATCH FUNC"
+        p[0] = Command("HATCH", p[2])
+
+    def p_statement_PUSH(self, p):
+        """statement : PUSH STR
+                     | PUSH INT
+                     | PUSH FLOAT
+        """
+        p[0] = Command("PUSH", None, None, p[2])
+
+    def p_statement_AS(self, p):
+        "statement : IDSTR AS IDSTR"
+        p[0] = Command("AS", (p[1], p[3]))
+
+    def p_statement_SETVAR(self, p):
+        """statement : ID LBRACK INT RBRACK EQ VAL
+                     | ID EQ VAL
         """
         if len(p) == 7:
             p[0] = Command("SET", p[1], p[3], p[6])
         else:
             p[0] = Command("SET", p[1], None, p[3])
 
-    def p_expression_GETVAR(self, p):
-        """expression : ID LBRACK INT RBRACK
-                      | ID
+    def p_statement_GETVAR(self, p):
+        """statement : ID LBRACK INT RBRACK
+                     | ID
         """
         if len(p) == 5:
             p[0] = Command("GET", p[1], p[3])
         else:
             p[0] = Command("GET", p[1])
 
-    def p_expression_PUSH(self, p):
-        """expression : PUSH STR
-                      | PUSH INT
-        """
-        p[0] = Command("PUSH", p[1], None, p[2])
-
-    def p_expression_HATCH(self, p):
-        "expression : HATCH function"
-        p[0] = Command("HATCH", p[2])
-
-    def p_expression_AS(self, p):
-        "expression : ID AS ID"
-        p[0] = Command("AS", (p[1], p[3]))
-
-    def p_expression_enter_block_build(self, p):
-        "expression : BUILD ID LBRACE"
-        p[0] = Command("BUILD", p[2])
-
-    def p_expression_enter_block_whilet(self, p):
-        "expression : WHILET LBRACE"
-        p[0] = Command("WHILE", "TRUE")
-
-    def p_expression_enter_block_whilef(self, p):
-        "expression : WHILEF LBRACE"
-        p[0] = Command("WHILE", "FALSE")
-
-    def p_expression_enter_block_ift(self, p):
-        "expression : IFT LBRACE"
-        p[0] = Command("IF", "TRUE")
-
-    def p_expression_enter_block_iff(self, p):
-        "expression : IFF LBRACE"
-        p[0] = Command("IF", "FALSE")
-
-    def p_expression_exit_block(self, p):
-        "expression : RBRACE"
-        p[0] = Command("EXIT")
-
     def p_FUNCTION(self, p):
-        """function : ID DOT function
-                    | ID
+        """FUNC : ID DOT FUNC
+                | ID
         """
         p[0] = ''.join(flatten(p[1:]))
 
     def p_VAL(self, p):
-        """val : STR
+        """VAL : STR
                | INT
                | TOP
+               | FLOAT
         """
         p[0] = p[1]
 
+    def p_IDSTR(self, p):
+        """IDSTR : ID
+                 | STR
+        """
+        p[0] = p[1]
+
+    # def p_OPTNEWLINE(self, p):
+    #     """OPTNEWLINE : NEWLINE
+    #                   |
+    #     """
 
 
 lexer = EggLex()
@@ -291,12 +349,13 @@ parser = EggParse()
 
 print(*lexer(
     "a as b\n"
+    "x as y \n"
     "build blah {\n"
     "\thatch ab.a\n"
     "\ta[2] = '3'\n"
     "\ta\n"
-    "\tiftrue {\n"
-    "\t\twhilefalse {\n"
+    "\tif_true {\n"
+    "\t\tloop_false {\n"
     "\t\t\tb[3] = Top\n"
     "\t\t}\n"
     "\t}\n"
@@ -309,19 +368,20 @@ print(*lexer(
 
 pprint(parser(
     "a as b\n"
+    "x as y\n"
     "build blah {\n"
     "\thatch ab.a\n"
     "\ta[2] = '3'\n"
     "\ta\n"
-    "\tiftrue {\n"
-    "\t\twhilefalse {\n"
+    "\tif_true {\n"
+    "\t\tloop_false {\n"
     "\t\t\tb[3] = Top\n"
     "\t\t}\n"
     "\t}\n"
     "\tb\n"
+    "\n"
     "\tpush 3\n"
     "\trooster\n"
     "\ta = Top\n"
-    "} // blah", debug=True
+    "} // blah", debug=0
 ))
-

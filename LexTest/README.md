@@ -3,9 +3,8 @@ This is the future parser that I will be using once I complete it, this format w
 that would have been virtually impossible to do previously.
 
 
-|                Todo                |
-|:----------------------------------:|
-|          Take OOP too far          |
-|        Make it do anything         |
-| Come up with better while notation |
-|          Make blocks work          |
+## Todo
+- Take OOP too far
+- Make it do anything
+- Come up with better while notation
+- Make blocks work

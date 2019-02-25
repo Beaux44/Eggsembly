@@ -1,7 +1,10 @@
+# Terminology
+
 I will be using standard terminology and applying it titles that are relevant to
 Eggsembly, as to make things easier for programmers coming from other languages.
 It will be structured similar to a typical dictionary to make it simpler.
-----
+
+----------------------------------------------------------
 |            Normal             |       Eggsembly        |
 |:-----------------------------:|:----------------------:|
 |         Address/Index         |          Area          |

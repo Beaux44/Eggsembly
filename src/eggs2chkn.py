@@ -1,15 +1,22 @@
-import re, inspect, os.path, colorama
+import re, inspect, os.path
 from difflib import SequenceMatcher
-colorama.init()
+try:
+    import colorama
+    colorama.init()
 
-WARNING = colorama.Fore.LIGHTYELLOW_EX
-ERROR   = colorama.Fore.LIGHTRED_EX
+    WARNING = colorama.Fore.LIGHTYELLOW_EX
+    ERROR   = colorama.Fore.LIGHTRED_EX
 
-def cprint(color, *args, **kwargs):
-    print(end=(color))
-    print(*args, **kwargs)
-    print(end=(colorama.Fore.RESET + colorama.Back.RESET))
+    def cprint(color, *args, **kwargs):
+        print(end=(color))
+        print(*args, **kwargs)
+        print(end=(colorama.Fore.RESET + colorama.Back.RESET))
+except ImportError:
+    WARNING = ""
+    ERROR   = ""
 
+    def cprint(_, *args, **kwargs):
+        print(*args, **kwargs)
 
 FILEPATH = lambda CALLNAME: "\\".join(inspect.getfile(inspect.currentframe()).split("\\")[:-1]) + ".\\lib\\" + CALLNAME
 ops = {

@@ -1,7 +1,26 @@
 # Eggsembly
-A multi-platform interpreter for the Eggsembly language, with comments added
+An interpreter for the Eggsembly language.
 
-# Regular development is temporarily on hiatus while I revamp parser
+## FAQ
+### What is Eggsembly?
+Eggsembly is a programming language that aims to make programming in [Chicken](https://esolangs.org/wiki/chicken) easier, by providing built-in looping, conditional statements, and strings, along with other higher-level language functionality.
+
+### How does it work?
+Eggsembly code is compiled into equivalent Chicken code which can then be run using either the interpreter that's along side the compiler, or the [original version](http://web.archive.org/web/20180420010853/http://torso.me/chicken). The ability for the compiled code to be run by either version is not handled by the compiler, so you will need to design your code for the version you want to be able to run it. Some examples can be run on the original, some can only run on the packaged interpreter.
+
+### How can I run an Eggsembly program?
+You can either use the [Online Interpreter/IDE](https://eggsembly-online-interpreter--sheep44.repl.co) (currently with nearly 0% uptime!), or, assuming you have a compatible version of Python *(tested and developed with 3.7)* and required modules, you can copy the [/src/](/src/) directory and use the `eggs.py` file to run or compile your program. You can run `py eggs.py -h` for help using it.
+
+### How often is this updated?
+Regular development is temporarily on hiatus while I revamp the parser, however it's generally whenever I want to update it; I'm not sure how often that is.
+
+### What do you mean when you say "chickens?"
+I have created a number of different terms regarding Eggsembly to make it ~~more confusing~~ easier to talk about. They can be found [here](TERMINOLOGY.md).
+
+### What are the limits of Eggsembly?
+Eggsembly is capable of doing anything theoretically possible to do in Chicken.
+
+---
 
 ## Standard Eggsembly commands
 |    Name    |                                                                          Description                                                                           |
@@ -17,7 +36,7 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 |    `fr`    |              Front chickens are a relative offset to jump to. The chicken below that is the condition. Jump only happens if condition is truthy.               |
 |   `bbq`    |                            Interprets the front chicken as ASCII and places the corresponding character chicken into front of pen.                             |
 |  `push n`  |                                                          Pushes the literal n chickens into the pen.                                                           |
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 ## Non-standard Eggsembly commands
 |                    Name                       |                               Description                                 |
@@ -26,27 +45,28 @@ A multi-platform interpreter for the Eggsembly language, with comments added
 |                   `push x`                    |         Pushes x onto the stack, x is either a string or integer          |
 |`caseSensitiveVariable([n])(="string"\|x\|Top)`|               assign or push caseSensitiveVariable to stack               |
 |                   `a as b`                    |                     Replace "a" with "b" in the code                      |
-|             `build roostName {}`              |              Build [roost](TERMINOLOGY.md) named "roostName"              |
------------------------------------------------------------------------------------------------------------------------------
+|             `build roostName {}`              |                       Build roost named "roostName"                       |
 
-## Ideas for some things that could be done
-|                       Todo                      |
-|:-----------------------------------------------:|
-|                  ~~Functions~~                  |
-|                   ~~Imports~~                   |
-|                  ~~Eggshell~~                   |
-|             ~~Rewrite HelloWorld~~              |
-|                 Package Manager                 |
-|               ~~String Literals~~               |
-|                    Division                     |
-|                  ~~Variables~~                  |
-|            ~~Variable Suggestions~~             |
-|                   ~~Macros~~                    |
-|                  If Statements                  |
-|                While Statements                 |
-|             ~~Online Interpreter~~              |
----------------------------------------------------
 
-The online IDE can be found [here](https://eggsembly-online-interpreter--sheep44.repl.co) during the time in which
+## Todo
+- ~~Comments~~
+- ~~Functions~~
+- ~~Imports~~
+- ~~Eggshell~~
+- ~~Rewrite HelloWorld~~
+- Package Manager
+- ~~String Literals~~
+- Float Literals
+- Division
+- ~~Variables~~
+- ~~Variable Suggestions~~
+- ~~Macros~~
+- If Statements
+- While Statements
+- ~~Online Interpreter~~
+- Bytecode compilation
+- Whatever else I want?
+
+The online Interpreter/IDE can be found [here](https://eggsembly-online-interpreter--sheep44.repl.co) during the time in which
 I bother to have it up; I'm working on getting a proper host for it. The current BNF syntax description can be found
 [here](Eggsembly.bnf) if you care about it.
