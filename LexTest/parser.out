@@ -1,586 +1,1414 @@
 Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 
-Unused terminals:
-
-    LPAREN
-    RPAREN
-
 Grammar
 
 Rule 0     S' -> expressions
-Rule 1     expressions -> expressions NEWLINE expression
-Rule 2     expressions -> expression
-Rule 3     expressions -> NEWLINE
-Rule 4     expression -> AXE
-Rule 5     expression -> CHICKEN
-Rule 6     expression -> ADD
-Rule 7     expression -> FOX
-Rule 8     expression -> ROOSTER
-Rule 9     expression -> COMPARE
-Rule 10    expression -> PICK
-Rule 11    expression -> PECK
-Rule 12    expression -> FR
-Rule 13    expression -> BBQ
-Rule 14    expression -> ID LBRACK INT RBRACK EQ val
-Rule 15    expression -> ID EQ val
-Rule 16    expression -> ID LBRACK INT RBRACK
-Rule 17    expression -> ID
-Rule 18    expression -> PUSH STR
-Rule 19    expression -> PUSH INT
-Rule 20    expression -> HATCH function
-Rule 21    expression -> ID AS ID
-Rule 22    expression -> BUILD ID LBRACE
-Rule 23    expression -> WHILET LBRACE
-Rule 24    expression -> WHILEF LBRACE
-Rule 25    expression -> IFT LBRACE
-Rule 26    expression -> IFF LBRACE
-Rule 27    expression -> RBRACE
-Rule 28    function -> ID DOT function
-Rule 29    function -> ID
-Rule 30    val -> STR
-Rule 31    val -> INT
-Rule 32    val -> TOP
+Rule 1     expressions -> expressions NEWLINE block
+Rule 2     expressions -> expressions NEWLINE stmt
+Rule 3     expressions -> block
+Rule 4     expressions -> stmt
+Rule 5     enter -> BUILD ID LBRACE
+Rule 6     enter -> LOOPT LBRACE
+Rule 7     enter -> LOOPF LBRACE
+Rule 8     enter -> REPT LBRACE
+Rule 9     enter -> REPF LBRACE
+Rule 10    enter -> IFT LBRACE
+Rule 11    enter -> IFF LBRACE
+Rule 12    block -> enter NEWLINE expressions NEWLINE RBRACE
+Rule 13    stmt -> AXE
+Rule 14    stmt -> CHICKEN
+Rule 15    stmt -> ADD
+Rule 16    stmt -> FOX
+Rule 17    stmt -> ROOSTER
+Rule 18    stmt -> COMPARE
+Rule 19    stmt -> PICK
+Rule 20    stmt -> PECK
+Rule 21    stmt -> FR
+Rule 22    stmt -> BBQ
+Rule 23    stmt -> HATCH FUNC
+Rule 24    stmt -> PUSH STR
+Rule 25    stmt -> PUSH mathexpr
+Rule 26    stmt -> IDSTR AS IDSTR
+Rule 27    stmt -> ID LBRACK INT RBRACK EQ VAL
+Rule 28    stmt -> ID EQ VAL
+Rule 29    stmt -> ID LBRACK INT RBRACK
+Rule 30    stmt -> ID
+Rule 31    stmt -> CONST ID EQ VAL
+Rule 32    stmt -> <empty>
+Rule 33    mathexpr -> mathexpr MUL mathexpr
+Rule 34    mathexpr -> mathexpr DIV mathexpr
+Rule 35    mathexpr -> mathexpr ADDE mathexpr
+Rule 36    mathexpr -> mathexpr SUB mathexpr
+Rule 37    mathexpr -> mathexpr POW mathexpr
+Rule 38    mathexpr -> LPAREN mathexpr RPAREN
+Rule 39    mathexpr -> SUB mathexpr
+Rule 40    mathexpr -> ADDE mathexpr
+Rule 41    mathexpr -> INT
+Rule 42    mathexpr -> FLOAT
+Rule 43    mathexpr -> ID
+Rule 44    FUNC -> ID DOT FUNC
+Rule 45    FUNC -> ID
+Rule 46    VAL -> STR
+Rule 47    VAL -> TOP
+Rule 48    VAL -> mathexpr
+Rule 49    IDSTR -> ID
+Rule 50    IDSTR -> STR
 
 Terminals, with rules where they appear
 
-ADD                  : 6
-AS                   : 21
-AXE                  : 4
-BBQ                  : 13
-BUILD                : 22
-CHICKEN              : 5
-COMPARE              : 9
-DOT                  : 28
-EQ                   : 14 15
-FOX                  : 7
-FR                   : 12
-HATCH                : 20
-ID                   : 14 15 16 17 21 21 22 28 29
-IFF                  : 26
-IFT                  : 25
-INT                  : 14 16 19 31
-LBRACE               : 22 23 24 25 26
-LBRACK               : 14 16
-LPAREN               : 
-NEWLINE              : 1 3
-PECK                 : 11
-PICK                 : 10
-PUSH                 : 18 19
-RBRACE               : 27
-RBRACK               : 14 16
-ROOSTER              : 8
-RPAREN               : 
-STR                  : 18 30
-TOP                  : 32
-WHILEF               : 24
-WHILET               : 23
+ADD                  : 15
+ADDE                 : 35 40
+AS                   : 26
+AXE                  : 13
+BBQ                  : 22
+BUILD                : 5
+CHICKEN              : 14
+COMPARE              : 18
+CONST                : 31
+DIV                  : 34
+DOT                  : 44
+EQ                   : 27 28 31
+FLOAT                : 42
+FOX                  : 16
+FR                   : 21
+HATCH                : 23
+ID                   : 5 27 28 29 30 31 43 44 45 49
+IFF                  : 11
+IFT                  : 10
+INT                  : 27 29 41
+LBRACE               : 5 6 7 8 9 10 11
+LBRACK               : 27 29
+LOOPF                : 7
+LOOPT                : 6
+LPAREN               : 38
+MUL                  : 33
+NEWLINE              : 1 2 12 12
+PECK                 : 20
+PICK                 : 19
+POW                  : 37
+PUSH                 : 24 25
+RBRACE               : 12
+RBRACK               : 27 29
+REPF                 : 9
+REPT                 : 8
+ROOSTER              : 17
+RPAREN               : 38
+STR                  : 24 46 50
+SUB                  : 36 39
+TOP                  : 47
 error                : 
 
 Nonterminals, with rules where they appear
 
-expression           : 1 2
-expressions          : 1 0
-function             : 20 28
-val                  : 14 15
+FUNC                 : 23 44
+IDSTR                : 26 26
+VAL                  : 27 28 31
+block                : 1 3
+enter                : 12
+expressions          : 1 2 12 0
+mathexpr             : 25 33 33 34 34 35 35 36 36 37 37 38 39 40 48
+stmt                 : 2 4
 
 Parsing method: LALR
 
 state 0
 
     (0) S' -> . expressions
-    (1) expressions -> . expressions NEWLINE expression
-    (2) expressions -> . expression
-    (3) expressions -> . NEWLINE
-    (4) expression -> . AXE
-    (5) expression -> . CHICKEN
-    (6) expression -> . ADD
-    (7) expression -> . FOX
-    (8) expression -> . ROOSTER
-    (9) expression -> . COMPARE
-    (10) expression -> . PICK
-    (11) expression -> . PECK
-    (12) expression -> . FR
-    (13) expression -> . BBQ
-    (14) expression -> . ID LBRACK INT RBRACK EQ val
-    (15) expression -> . ID EQ val
-    (16) expression -> . ID LBRACK INT RBRACK
-    (17) expression -> . ID
-    (18) expression -> . PUSH STR
-    (19) expression -> . PUSH INT
-    (20) expression -> . HATCH function
-    (21) expression -> . ID AS ID
-    (22) expression -> . BUILD ID LBRACE
-    (23) expression -> . WHILET LBRACE
-    (24) expression -> . WHILEF LBRACE
-    (25) expression -> . IFT LBRACE
-    (26) expression -> . IFF LBRACE
-    (27) expression -> . RBRACE
+    (1) expressions -> . expressions NEWLINE block
+    (2) expressions -> . expressions NEWLINE stmt
+    (3) expressions -> . block
+    (4) expressions -> . stmt
+    (12) block -> . enter NEWLINE expressions NEWLINE RBRACE
+    (13) stmt -> . AXE
+    (14) stmt -> . CHICKEN
+    (15) stmt -> . ADD
+    (16) stmt -> . FOX
+    (17) stmt -> . ROOSTER
+    (18) stmt -> . COMPARE
+    (19) stmt -> . PICK
+    (20) stmt -> . PECK
+    (21) stmt -> . FR
+    (22) stmt -> . BBQ
+    (23) stmt -> . HATCH FUNC
+    (24) stmt -> . PUSH STR
+    (25) stmt -> . PUSH mathexpr
+    (26) stmt -> . IDSTR AS IDSTR
+    (27) stmt -> . ID LBRACK INT RBRACK EQ VAL
+    (28) stmt -> . ID EQ VAL
+    (29) stmt -> . ID LBRACK INT RBRACK
+    (30) stmt -> . ID
+    (31) stmt -> . CONST ID EQ VAL
+    (32) stmt -> .
+    (5) enter -> . BUILD ID LBRACE
+    (6) enter -> . LOOPT LBRACE
+    (7) enter -> . LOOPF LBRACE
+    (8) enter -> . REPT LBRACE
+    (9) enter -> . REPF LBRACE
+    (10) enter -> . IFT LBRACE
+    (11) enter -> . IFF LBRACE
+    (49) IDSTR -> . ID
+    (50) IDSTR -> . STR
 
-    NEWLINE         shift and go to state 2
-    AXE             shift and go to state 4
-    CHICKEN         shift and go to state 5
-    ADD             shift and go to state 6
-    FOX             shift and go to state 7
-    ROOSTER         shift and go to state 8
-    COMPARE         shift and go to state 9
-    PICK            shift and go to state 10
-    PECK            shift and go to state 11
-    FR              shift and go to state 12
-    BBQ             shift and go to state 13
-    ID              shift and go to state 14
-    PUSH            shift and go to state 15
-    HATCH           shift and go to state 16
-    BUILD           shift and go to state 17
-    WHILET          shift and go to state 18
-    WHILEF          shift and go to state 19
-    IFT             shift and go to state 20
-    IFF             shift and go to state 21
-    RBRACE          shift and go to state 22
+    AXE             shift and go to state 5
+    CHICKEN         shift and go to state 6
+    ADD             shift and go to state 7
+    FOX             shift and go to state 8
+    ROOSTER         shift and go to state 9
+    COMPARE         shift and go to state 10
+    PICK            shift and go to state 11
+    PECK            shift and go to state 12
+    FR              shift and go to state 13
+    BBQ             shift and go to state 14
+    HATCH           shift and go to state 15
+    PUSH            shift and go to state 16
+    ID              shift and go to state 19
+    CONST           shift and go to state 20
+    NEWLINE         reduce using rule 32 (stmt -> .)
+    $end            reduce using rule 32 (stmt -> .)
+    BUILD           shift and go to state 21
+    LOOPT           shift and go to state 22
+    LOOPF           shift and go to state 23
+    REPT            shift and go to state 24
+    REPF            shift and go to state 25
+    IFT             shift and go to state 26
+    IFF             shift and go to state 27
+    STR             shift and go to state 17
 
     expressions                    shift and go to state 1
-    expression                     shift and go to state 3
+    block                          shift and go to state 2
+    stmt                           shift and go to state 3
+    enter                          shift and go to state 4
+    IDSTR                          shift and go to state 18
 
 state 1
 
     (0) S' -> expressions .
-    (1) expressions -> expressions . NEWLINE expression
+    (1) expressions -> expressions . NEWLINE block
+    (2) expressions -> expressions . NEWLINE stmt
 
-    NEWLINE         shift and go to state 23
+    NEWLINE         shift and go to state 28
 
 
 state 2
 
-    (3) expressions -> NEWLINE .
+    (3) expressions -> block .
 
-    NEWLINE         reduce using rule 3 (expressions -> NEWLINE .)
-    $end            reduce using rule 3 (expressions -> NEWLINE .)
+    NEWLINE         reduce using rule 3 (expressions -> block .)
+    $end            reduce using rule 3 (expressions -> block .)
 
 
 state 3
 
-    (2) expressions -> expression .
+    (4) expressions -> stmt .
 
-    NEWLINE         reduce using rule 2 (expressions -> expression .)
-    $end            reduce using rule 2 (expressions -> expression .)
+    NEWLINE         reduce using rule 4 (expressions -> stmt .)
+    $end            reduce using rule 4 (expressions -> stmt .)
 
 
 state 4
 
-    (4) expression -> AXE .
+    (12) block -> enter . NEWLINE expressions NEWLINE RBRACE
 
-    NEWLINE         reduce using rule 4 (expression -> AXE .)
-    $end            reduce using rule 4 (expression -> AXE .)
+    NEWLINE         shift and go to state 29
 
 
 state 5
 
-    (5) expression -> CHICKEN .
+    (13) stmt -> AXE .
 
-    NEWLINE         reduce using rule 5 (expression -> CHICKEN .)
-    $end            reduce using rule 5 (expression -> CHICKEN .)
+    NEWLINE         reduce using rule 13 (stmt -> AXE .)
+    $end            reduce using rule 13 (stmt -> AXE .)
 
 
 state 6
 
-    (6) expression -> ADD .
+    (14) stmt -> CHICKEN .
 
-    NEWLINE         reduce using rule 6 (expression -> ADD .)
-    $end            reduce using rule 6 (expression -> ADD .)
+    NEWLINE         reduce using rule 14 (stmt -> CHICKEN .)
+    $end            reduce using rule 14 (stmt -> CHICKEN .)
 
 
 state 7
 
-    (7) expression -> FOX .
+    (15) stmt -> ADD .
 
-    NEWLINE         reduce using rule 7 (expression -> FOX .)
-    $end            reduce using rule 7 (expression -> FOX .)
+    NEWLINE         reduce using rule 15 (stmt -> ADD .)
+    $end            reduce using rule 15 (stmt -> ADD .)
 
 
 state 8
 
-    (8) expression -> ROOSTER .
+    (16) stmt -> FOX .
 
-    NEWLINE         reduce using rule 8 (expression -> ROOSTER .)
-    $end            reduce using rule 8 (expression -> ROOSTER .)
+    NEWLINE         reduce using rule 16 (stmt -> FOX .)
+    $end            reduce using rule 16 (stmt -> FOX .)
 
 
 state 9
 
-    (9) expression -> COMPARE .
+    (17) stmt -> ROOSTER .
 
-    NEWLINE         reduce using rule 9 (expression -> COMPARE .)
-    $end            reduce using rule 9 (expression -> COMPARE .)
+    NEWLINE         reduce using rule 17 (stmt -> ROOSTER .)
+    $end            reduce using rule 17 (stmt -> ROOSTER .)
 
 
 state 10
 
-    (10) expression -> PICK .
+    (18) stmt -> COMPARE .
 
-    NEWLINE         reduce using rule 10 (expression -> PICK .)
-    $end            reduce using rule 10 (expression -> PICK .)
+    NEWLINE         reduce using rule 18 (stmt -> COMPARE .)
+    $end            reduce using rule 18 (stmt -> COMPARE .)
 
 
 state 11
 
-    (11) expression -> PECK .
+    (19) stmt -> PICK .
 
-    NEWLINE         reduce using rule 11 (expression -> PECK .)
-    $end            reduce using rule 11 (expression -> PECK .)
+    NEWLINE         reduce using rule 19 (stmt -> PICK .)
+    $end            reduce using rule 19 (stmt -> PICK .)
 
 
 state 12
 
-    (12) expression -> FR .
+    (20) stmt -> PECK .
 
-    NEWLINE         reduce using rule 12 (expression -> FR .)
-    $end            reduce using rule 12 (expression -> FR .)
+    NEWLINE         reduce using rule 20 (stmt -> PECK .)
+    $end            reduce using rule 20 (stmt -> PECK .)
 
 
 state 13
 
-    (13) expression -> BBQ .
+    (21) stmt -> FR .
 
-    NEWLINE         reduce using rule 13 (expression -> BBQ .)
-    $end            reduce using rule 13 (expression -> BBQ .)
+    NEWLINE         reduce using rule 21 (stmt -> FR .)
+    $end            reduce using rule 21 (stmt -> FR .)
 
 
 state 14
 
-    (14) expression -> ID . LBRACK INT RBRACK EQ val
-    (15) expression -> ID . EQ val
-    (16) expression -> ID . LBRACK INT RBRACK
-    (17) expression -> ID .
-    (21) expression -> ID . AS ID
+    (22) stmt -> BBQ .
 
-    LBRACK          shift and go to state 24
-    EQ              shift and go to state 25
-    NEWLINE         reduce using rule 17 (expression -> ID .)
-    $end            reduce using rule 17 (expression -> ID .)
-    AS              shift and go to state 26
+    NEWLINE         reduce using rule 22 (stmt -> BBQ .)
+    $end            reduce using rule 22 (stmt -> BBQ .)
 
 
 state 15
 
-    (18) expression -> PUSH . STR
-    (19) expression -> PUSH . INT
+    (23) stmt -> HATCH . FUNC
+    (44) FUNC -> . ID DOT FUNC
+    (45) FUNC -> . ID
 
-    STR             shift and go to state 27
-    INT             shift and go to state 28
+    ID              shift and go to state 31
 
+    FUNC                           shift and go to state 30
 
 state 16
 
-    (20) expression -> HATCH . function
-    (28) function -> . ID DOT function
-    (29) function -> . ID
+    (24) stmt -> PUSH . STR
+    (25) stmt -> PUSH . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
 
-    ID              shift and go to state 30
+    STR             shift and go to state 32
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
 
-    function                       shift and go to state 29
+    mathexpr                       shift and go to state 33
 
 state 17
 
-    (22) expression -> BUILD . ID LBRACE
+    (50) IDSTR -> STR .
 
-    ID              shift and go to state 31
+    AS              reduce using rule 50 (IDSTR -> STR .)
+    NEWLINE         reduce using rule 50 (IDSTR -> STR .)
+    $end            reduce using rule 50 (IDSTR -> STR .)
 
 
 state 18
 
-    (23) expression -> WHILET . LBRACE
+    (26) stmt -> IDSTR . AS IDSTR
 
-    LBRACE          shift and go to state 32
+    AS              shift and go to state 40
 
 
 state 19
 
-    (24) expression -> WHILEF . LBRACE
+    (27) stmt -> ID . LBRACK INT RBRACK EQ VAL
+    (28) stmt -> ID . EQ VAL
+    (29) stmt -> ID . LBRACK INT RBRACK
+    (30) stmt -> ID .
+    (49) IDSTR -> ID .
 
-    LBRACE          shift and go to state 33
+    LBRACK          shift and go to state 41
+    EQ              shift and go to state 42
+    NEWLINE         reduce using rule 30 (stmt -> ID .)
+    $end            reduce using rule 30 (stmt -> ID .)
+    AS              reduce using rule 49 (IDSTR -> ID .)
 
 
 state 20
 
-    (25) expression -> IFT . LBRACE
+    (31) stmt -> CONST . ID EQ VAL
 
-    LBRACE          shift and go to state 34
+    ID              shift and go to state 43
 
 
 state 21
 
-    (26) expression -> IFF . LBRACE
+    (5) enter -> BUILD . ID LBRACE
 
-    LBRACE          shift and go to state 35
+    ID              shift and go to state 44
 
 
 state 22
 
-    (27) expression -> RBRACE .
+    (6) enter -> LOOPT . LBRACE
 
-    NEWLINE         reduce using rule 27 (expression -> RBRACE .)
-    $end            reduce using rule 27 (expression -> RBRACE .)
+    LBRACE          shift and go to state 45
 
 
 state 23
 
-    (1) expressions -> expressions NEWLINE . expression
-    (4) expression -> . AXE
-    (5) expression -> . CHICKEN
-    (6) expression -> . ADD
-    (7) expression -> . FOX
-    (8) expression -> . ROOSTER
-    (9) expression -> . COMPARE
-    (10) expression -> . PICK
-    (11) expression -> . PECK
-    (12) expression -> . FR
-    (13) expression -> . BBQ
-    (14) expression -> . ID LBRACK INT RBRACK EQ val
-    (15) expression -> . ID EQ val
-    (16) expression -> . ID LBRACK INT RBRACK
-    (17) expression -> . ID
-    (18) expression -> . PUSH STR
-    (19) expression -> . PUSH INT
-    (20) expression -> . HATCH function
-    (21) expression -> . ID AS ID
-    (22) expression -> . BUILD ID LBRACE
-    (23) expression -> . WHILET LBRACE
-    (24) expression -> . WHILEF LBRACE
-    (25) expression -> . IFT LBRACE
-    (26) expression -> . IFF LBRACE
-    (27) expression -> . RBRACE
+    (7) enter -> LOOPF . LBRACE
 
-    AXE             shift and go to state 4
-    CHICKEN         shift and go to state 5
-    ADD             shift and go to state 6
-    FOX             shift and go to state 7
-    ROOSTER         shift and go to state 8
-    COMPARE         shift and go to state 9
-    PICK            shift and go to state 10
-    PECK            shift and go to state 11
-    FR              shift and go to state 12
-    BBQ             shift and go to state 13
-    ID              shift and go to state 14
-    PUSH            shift and go to state 15
-    HATCH           shift and go to state 16
-    BUILD           shift and go to state 17
-    WHILET          shift and go to state 18
-    WHILEF          shift and go to state 19
-    IFT             shift and go to state 20
-    IFF             shift and go to state 21
-    RBRACE          shift and go to state 22
+    LBRACE          shift and go to state 46
 
-    expression                     shift and go to state 36
 
 state 24
 
-    (14) expression -> ID LBRACK . INT RBRACK EQ val
-    (16) expression -> ID LBRACK . INT RBRACK
+    (8) enter -> REPT . LBRACE
 
-    INT             shift and go to state 37
+    LBRACE          shift and go to state 47
 
 
 state 25
 
-    (15) expression -> ID EQ . val
-    (30) val -> . STR
-    (31) val -> . INT
-    (32) val -> . TOP
+    (9) enter -> REPF . LBRACE
 
-    STR             shift and go to state 39
-    INT             shift and go to state 40
-    TOP             shift and go to state 41
+    LBRACE          shift and go to state 48
 
-    val                            shift and go to state 38
 
 state 26
 
-    (21) expression -> ID AS . ID
+    (10) enter -> IFT . LBRACE
 
-    ID              shift and go to state 42
+    LBRACE          shift and go to state 49
 
 
 state 27
 
-    (18) expression -> PUSH STR .
+    (11) enter -> IFF . LBRACE
 
-    NEWLINE         reduce using rule 18 (expression -> PUSH STR .)
-    $end            reduce using rule 18 (expression -> PUSH STR .)
+    LBRACE          shift and go to state 50
 
 
 state 28
 
-    (19) expression -> PUSH INT .
+    (1) expressions -> expressions NEWLINE . block
+    (2) expressions -> expressions NEWLINE . stmt
+    (12) block -> . enter NEWLINE expressions NEWLINE RBRACE
+    (13) stmt -> . AXE
+    (14) stmt -> . CHICKEN
+    (15) stmt -> . ADD
+    (16) stmt -> . FOX
+    (17) stmt -> . ROOSTER
+    (18) stmt -> . COMPARE
+    (19) stmt -> . PICK
+    (20) stmt -> . PECK
+    (21) stmt -> . FR
+    (22) stmt -> . BBQ
+    (23) stmt -> . HATCH FUNC
+    (24) stmt -> . PUSH STR
+    (25) stmt -> . PUSH mathexpr
+    (26) stmt -> . IDSTR AS IDSTR
+    (27) stmt -> . ID LBRACK INT RBRACK EQ VAL
+    (28) stmt -> . ID EQ VAL
+    (29) stmt -> . ID LBRACK INT RBRACK
+    (30) stmt -> . ID
+    (31) stmt -> . CONST ID EQ VAL
+    (32) stmt -> .
+    (5) enter -> . BUILD ID LBRACE
+    (6) enter -> . LOOPT LBRACE
+    (7) enter -> . LOOPF LBRACE
+    (8) enter -> . REPT LBRACE
+    (9) enter -> . REPF LBRACE
+    (10) enter -> . IFT LBRACE
+    (11) enter -> . IFF LBRACE
+    (49) IDSTR -> . ID
+    (50) IDSTR -> . STR
 
-    NEWLINE         reduce using rule 19 (expression -> PUSH INT .)
-    $end            reduce using rule 19 (expression -> PUSH INT .)
+    AXE             shift and go to state 5
+    CHICKEN         shift and go to state 6
+    ADD             shift and go to state 7
+    FOX             shift and go to state 8
+    ROOSTER         shift and go to state 9
+    COMPARE         shift and go to state 10
+    PICK            shift and go to state 11
+    PECK            shift and go to state 12
+    FR              shift and go to state 13
+    BBQ             shift and go to state 14
+    HATCH           shift and go to state 15
+    PUSH            shift and go to state 16
+    ID              shift and go to state 19
+    CONST           shift and go to state 20
+    NEWLINE         reduce using rule 32 (stmt -> .)
+    $end            reduce using rule 32 (stmt -> .)
+    BUILD           shift and go to state 21
+    LOOPT           shift and go to state 22
+    LOOPF           shift and go to state 23
+    REPT            shift and go to state 24
+    REPF            shift and go to state 25
+    IFT             shift and go to state 26
+    IFF             shift and go to state 27
+    STR             shift and go to state 17
 
+    block                          shift and go to state 51
+    stmt                           shift and go to state 52
+    enter                          shift and go to state 4
+    IDSTR                          shift and go to state 18
 
 state 29
 
-    (20) expression -> HATCH function .
+    (12) block -> enter NEWLINE . expressions NEWLINE RBRACE
+    (1) expressions -> . expressions NEWLINE block
+    (2) expressions -> . expressions NEWLINE stmt
+    (3) expressions -> . block
+    (4) expressions -> . stmt
+    (12) block -> . enter NEWLINE expressions NEWLINE RBRACE
+    (13) stmt -> . AXE
+    (14) stmt -> . CHICKEN
+    (15) stmt -> . ADD
+    (16) stmt -> . FOX
+    (17) stmt -> . ROOSTER
+    (18) stmt -> . COMPARE
+    (19) stmt -> . PICK
+    (20) stmt -> . PECK
+    (21) stmt -> . FR
+    (22) stmt -> . BBQ
+    (23) stmt -> . HATCH FUNC
+    (24) stmt -> . PUSH STR
+    (25) stmt -> . PUSH mathexpr
+    (26) stmt -> . IDSTR AS IDSTR
+    (27) stmt -> . ID LBRACK INT RBRACK EQ VAL
+    (28) stmt -> . ID EQ VAL
+    (29) stmt -> . ID LBRACK INT RBRACK
+    (30) stmt -> . ID
+    (31) stmt -> . CONST ID EQ VAL
+    (32) stmt -> .
+    (5) enter -> . BUILD ID LBRACE
+    (6) enter -> . LOOPT LBRACE
+    (7) enter -> . LOOPF LBRACE
+    (8) enter -> . REPT LBRACE
+    (9) enter -> . REPF LBRACE
+    (10) enter -> . IFT LBRACE
+    (11) enter -> . IFF LBRACE
+    (49) IDSTR -> . ID
+    (50) IDSTR -> . STR
 
-    NEWLINE         reduce using rule 20 (expression -> HATCH function .)
-    $end            reduce using rule 20 (expression -> HATCH function .)
+    AXE             shift and go to state 5
+    CHICKEN         shift and go to state 6
+    ADD             shift and go to state 7
+    FOX             shift and go to state 8
+    ROOSTER         shift and go to state 9
+    COMPARE         shift and go to state 10
+    PICK            shift and go to state 11
+    PECK            shift and go to state 12
+    FR              shift and go to state 13
+    BBQ             shift and go to state 14
+    HATCH           shift and go to state 15
+    PUSH            shift and go to state 16
+    ID              shift and go to state 19
+    CONST           shift and go to state 20
+    NEWLINE         reduce using rule 32 (stmt -> .)
+    BUILD           shift and go to state 21
+    LOOPT           shift and go to state 22
+    LOOPF           shift and go to state 23
+    REPT            shift and go to state 24
+    REPF            shift and go to state 25
+    IFT             shift and go to state 26
+    IFF             shift and go to state 27
+    STR             shift and go to state 17
 
+    enter                          shift and go to state 4
+    expressions                    shift and go to state 53
+    block                          shift and go to state 2
+    stmt                           shift and go to state 3
+    IDSTR                          shift and go to state 18
 
 state 30
 
-    (28) function -> ID . DOT function
-    (29) function -> ID .
+    (23) stmt -> HATCH FUNC .
 
-    DOT             shift and go to state 43
-    NEWLINE         reduce using rule 29 (function -> ID .)
-    $end            reduce using rule 29 (function -> ID .)
+    NEWLINE         reduce using rule 23 (stmt -> HATCH FUNC .)
+    $end            reduce using rule 23 (stmt -> HATCH FUNC .)
 
 
 state 31
 
-    (22) expression -> BUILD ID . LBRACE
+    (44) FUNC -> ID . DOT FUNC
+    (45) FUNC -> ID .
 
-    LBRACE          shift and go to state 44
+    DOT             shift and go to state 54
+    NEWLINE         reduce using rule 45 (FUNC -> ID .)
+    $end            reduce using rule 45 (FUNC -> ID .)
 
 
 state 32
 
-    (23) expression -> WHILET LBRACE .
+    (24) stmt -> PUSH STR .
 
-    NEWLINE         reduce using rule 23 (expression -> WHILET LBRACE .)
-    $end            reduce using rule 23 (expression -> WHILET LBRACE .)
+    NEWLINE         reduce using rule 24 (stmt -> PUSH STR .)
+    $end            reduce using rule 24 (stmt -> PUSH STR .)
 
 
 state 33
 
-    (24) expression -> WHILEF LBRACE .
+    (25) stmt -> PUSH mathexpr .
+    (33) mathexpr -> mathexpr . MUL mathexpr
+    (34) mathexpr -> mathexpr . DIV mathexpr
+    (35) mathexpr -> mathexpr . ADDE mathexpr
+    (36) mathexpr -> mathexpr . SUB mathexpr
+    (37) mathexpr -> mathexpr . POW mathexpr
 
-    NEWLINE         reduce using rule 24 (expression -> WHILEF LBRACE .)
-    $end            reduce using rule 24 (expression -> WHILEF LBRACE .)
+    NEWLINE         reduce using rule 25 (stmt -> PUSH mathexpr .)
+    $end            reduce using rule 25 (stmt -> PUSH mathexpr .)
+    MUL             shift and go to state 55
+    DIV             shift and go to state 56
+    ADDE            shift and go to state 57
+    SUB             shift and go to state 58
+    POW             shift and go to state 59
 
 
 state 34
 
-    (25) expression -> IFT LBRACE .
+    (40) mathexpr -> ADDE . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
 
-    NEWLINE         reduce using rule 25 (expression -> IFT LBRACE .)
-    $end            reduce using rule 25 (expression -> IFT LBRACE .)
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
 
+    mathexpr                       shift and go to state 60
 
 state 35
 
-    (26) expression -> IFF LBRACE .
+    (39) mathexpr -> SUB . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
 
-    NEWLINE         reduce using rule 26 (expression -> IFF LBRACE .)
-    $end            reduce using rule 26 (expression -> IFF LBRACE .)
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
 
+    mathexpr                       shift and go to state 61
 
 state 36
 
-    (1) expressions -> expressions NEWLINE expression .
+    (38) mathexpr -> LPAREN . mathexpr RPAREN
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
 
-    NEWLINE         reduce using rule 1 (expressions -> expressions NEWLINE expression .)
-    $end            reduce using rule 1 (expressions -> expressions NEWLINE expression .)
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
 
+    mathexpr                       shift and go to state 62
 
 state 37
 
-    (14) expression -> ID LBRACK INT . RBRACK EQ val
-    (16) expression -> ID LBRACK INT . RBRACK
+    (41) mathexpr -> INT .
 
-    RBRACK          shift and go to state 45
+    MUL             reduce using rule 41 (mathexpr -> INT .)
+    DIV             reduce using rule 41 (mathexpr -> INT .)
+    ADDE            reduce using rule 41 (mathexpr -> INT .)
+    SUB             reduce using rule 41 (mathexpr -> INT .)
+    POW             reduce using rule 41 (mathexpr -> INT .)
+    NEWLINE         reduce using rule 41 (mathexpr -> INT .)
+    $end            reduce using rule 41 (mathexpr -> INT .)
+    RPAREN          reduce using rule 41 (mathexpr -> INT .)
 
 
 state 38
 
-    (15) expression -> ID EQ val .
+    (42) mathexpr -> FLOAT .
 
-    NEWLINE         reduce using rule 15 (expression -> ID EQ val .)
-    $end            reduce using rule 15 (expression -> ID EQ val .)
+    MUL             reduce using rule 42 (mathexpr -> FLOAT .)
+    DIV             reduce using rule 42 (mathexpr -> FLOAT .)
+    ADDE            reduce using rule 42 (mathexpr -> FLOAT .)
+    SUB             reduce using rule 42 (mathexpr -> FLOAT .)
+    POW             reduce using rule 42 (mathexpr -> FLOAT .)
+    NEWLINE         reduce using rule 42 (mathexpr -> FLOAT .)
+    $end            reduce using rule 42 (mathexpr -> FLOAT .)
+    RPAREN          reduce using rule 42 (mathexpr -> FLOAT .)
 
 
 state 39
 
-    (30) val -> STR .
+    (43) mathexpr -> ID .
 
-    NEWLINE         reduce using rule 30 (val -> STR .)
-    $end            reduce using rule 30 (val -> STR .)
+    MUL             reduce using rule 43 (mathexpr -> ID .)
+    DIV             reduce using rule 43 (mathexpr -> ID .)
+    ADDE            reduce using rule 43 (mathexpr -> ID .)
+    SUB             reduce using rule 43 (mathexpr -> ID .)
+    POW             reduce using rule 43 (mathexpr -> ID .)
+    NEWLINE         reduce using rule 43 (mathexpr -> ID .)
+    $end            reduce using rule 43 (mathexpr -> ID .)
+    RPAREN          reduce using rule 43 (mathexpr -> ID .)
 
 
 state 40
 
-    (31) val -> INT .
+    (26) stmt -> IDSTR AS . IDSTR
+    (49) IDSTR -> . ID
+    (50) IDSTR -> . STR
 
-    NEWLINE         reduce using rule 31 (val -> INT .)
-    $end            reduce using rule 31 (val -> INT .)
+    ID              shift and go to state 64
+    STR             shift and go to state 17
 
+    IDSTR                          shift and go to state 63
 
 state 41
 
-    (32) val -> TOP .
+    (27) stmt -> ID LBRACK . INT RBRACK EQ VAL
+    (29) stmt -> ID LBRACK . INT RBRACK
 
-    NEWLINE         reduce using rule 32 (val -> TOP .)
-    $end            reduce using rule 32 (val -> TOP .)
+    INT             shift and go to state 65
 
 
 state 42
 
-    (21) expression -> ID AS ID .
+    (28) stmt -> ID EQ . VAL
+    (46) VAL -> . STR
+    (47) VAL -> . TOP
+    (48) VAL -> . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
 
-    NEWLINE         reduce using rule 21 (expression -> ID AS ID .)
-    $end            reduce using rule 21 (expression -> ID AS ID .)
+    STR             shift and go to state 67
+    TOP             shift and go to state 68
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
 
+    VAL                            shift and go to state 66
+    mathexpr                       shift and go to state 69
 
 state 43
 
-    (28) function -> ID DOT . function
-    (28) function -> . ID DOT function
-    (29) function -> . ID
+    (31) stmt -> CONST ID . EQ VAL
 
-    ID              shift and go to state 30
+    EQ              shift and go to state 70
 
-    function                       shift and go to state 46
 
 state 44
 
-    (22) expression -> BUILD ID LBRACE .
+    (5) enter -> BUILD ID . LBRACE
 
-    NEWLINE         reduce using rule 22 (expression -> BUILD ID LBRACE .)
-    $end            reduce using rule 22 (expression -> BUILD ID LBRACE .)
+    LBRACE          shift and go to state 71
 
 
 state 45
 
-    (14) expression -> ID LBRACK INT RBRACK . EQ val
-    (16) expression -> ID LBRACK INT RBRACK .
+    (6) enter -> LOOPT LBRACE .
 
-    EQ              shift and go to state 47
-    NEWLINE         reduce using rule 16 (expression -> ID LBRACK INT RBRACK .)
-    $end            reduce using rule 16 (expression -> ID LBRACK INT RBRACK .)
+    NEWLINE         reduce using rule 6 (enter -> LOOPT LBRACE .)
 
 
 state 46
 
-    (28) function -> ID DOT function .
+    (7) enter -> LOOPF LBRACE .
 
-    NEWLINE         reduce using rule 28 (function -> ID DOT function .)
-    $end            reduce using rule 28 (function -> ID DOT function .)
+    NEWLINE         reduce using rule 7 (enter -> LOOPF LBRACE .)
 
 
 state 47
 
-    (14) expression -> ID LBRACK INT RBRACK EQ . val
-    (30) val -> . STR
-    (31) val -> . INT
-    (32) val -> . TOP
+    (8) enter -> REPT LBRACE .
 
-    STR             shift and go to state 39
-    INT             shift and go to state 40
-    TOP             shift and go to state 41
+    NEWLINE         reduce using rule 8 (enter -> REPT LBRACE .)
 
-    val                            shift and go to state 48
 
 state 48
 
-    (14) expression -> ID LBRACK INT RBRACK EQ val .
+    (9) enter -> REPF LBRACE .
 
-    NEWLINE         reduce using rule 14 (expression -> ID LBRACK INT RBRACK EQ val .)
-    $end            reduce using rule 14 (expression -> ID LBRACK INT RBRACK EQ val .)
+    NEWLINE         reduce using rule 9 (enter -> REPF LBRACE .)
+
+
+state 49
+
+    (10) enter -> IFT LBRACE .
+
+    NEWLINE         reduce using rule 10 (enter -> IFT LBRACE .)
+
+
+state 50
+
+    (11) enter -> IFF LBRACE .
+
+    NEWLINE         reduce using rule 11 (enter -> IFF LBRACE .)
+
+
+state 51
+
+    (1) expressions -> expressions NEWLINE block .
+
+    NEWLINE         reduce using rule 1 (expressions -> expressions NEWLINE block .)
+    $end            reduce using rule 1 (expressions -> expressions NEWLINE block .)
+
+
+state 52
+
+    (2) expressions -> expressions NEWLINE stmt .
+
+    NEWLINE         reduce using rule 2 (expressions -> expressions NEWLINE stmt .)
+    $end            reduce using rule 2 (expressions -> expressions NEWLINE stmt .)
+
+
+state 53
+
+    (12) block -> enter NEWLINE expressions . NEWLINE RBRACE
+    (1) expressions -> expressions . NEWLINE block
+    (2) expressions -> expressions . NEWLINE stmt
+
+    NEWLINE         shift and go to state 72
+
+
+state 54
+
+    (44) FUNC -> ID DOT . FUNC
+    (44) FUNC -> . ID DOT FUNC
+    (45) FUNC -> . ID
+
+    ID              shift and go to state 31
+
+    FUNC                           shift and go to state 73
+
+state 55
+
+    (33) mathexpr -> mathexpr MUL . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
+
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
+
+    mathexpr                       shift and go to state 74
+
+state 56
+
+    (34) mathexpr -> mathexpr DIV . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
+
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
+
+    mathexpr                       shift and go to state 75
+
+state 57
+
+    (35) mathexpr -> mathexpr ADDE . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
+
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
+
+    mathexpr                       shift and go to state 76
+
+state 58
+
+    (36) mathexpr -> mathexpr SUB . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
+
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
+
+    mathexpr                       shift and go to state 77
+
+state 59
+
+    (37) mathexpr -> mathexpr POW . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
+
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
+
+    mathexpr                       shift and go to state 78
+
+state 60
+
+    (40) mathexpr -> ADDE mathexpr .
+    (33) mathexpr -> mathexpr . MUL mathexpr
+    (34) mathexpr -> mathexpr . DIV mathexpr
+    (35) mathexpr -> mathexpr . ADDE mathexpr
+    (36) mathexpr -> mathexpr . SUB mathexpr
+    (37) mathexpr -> mathexpr . POW mathexpr
+
+    MUL             reduce using rule 40 (mathexpr -> ADDE mathexpr .)
+    DIV             reduce using rule 40 (mathexpr -> ADDE mathexpr .)
+    ADDE            reduce using rule 40 (mathexpr -> ADDE mathexpr .)
+    SUB             reduce using rule 40 (mathexpr -> ADDE mathexpr .)
+    NEWLINE         reduce using rule 40 (mathexpr -> ADDE mathexpr .)
+    $end            reduce using rule 40 (mathexpr -> ADDE mathexpr .)
+    RPAREN          reduce using rule 40 (mathexpr -> ADDE mathexpr .)
+    POW             shift and go to state 59
+
+  ! POW             [ reduce using rule 40 (mathexpr -> ADDE mathexpr .) ]
+  ! MUL             [ shift and go to state 55 ]
+  ! DIV             [ shift and go to state 56 ]
+  ! ADDE            [ shift and go to state 57 ]
+  ! SUB             [ shift and go to state 58 ]
+
+
+state 61
+
+    (39) mathexpr -> SUB mathexpr .
+    (33) mathexpr -> mathexpr . MUL mathexpr
+    (34) mathexpr -> mathexpr . DIV mathexpr
+    (35) mathexpr -> mathexpr . ADDE mathexpr
+    (36) mathexpr -> mathexpr . SUB mathexpr
+    (37) mathexpr -> mathexpr . POW mathexpr
+
+    MUL             reduce using rule 39 (mathexpr -> SUB mathexpr .)
+    DIV             reduce using rule 39 (mathexpr -> SUB mathexpr .)
+    ADDE            reduce using rule 39 (mathexpr -> SUB mathexpr .)
+    SUB             reduce using rule 39 (mathexpr -> SUB mathexpr .)
+    NEWLINE         reduce using rule 39 (mathexpr -> SUB mathexpr .)
+    $end            reduce using rule 39 (mathexpr -> SUB mathexpr .)
+    RPAREN          reduce using rule 39 (mathexpr -> SUB mathexpr .)
+    POW             shift and go to state 59
+
+  ! POW             [ reduce using rule 39 (mathexpr -> SUB mathexpr .) ]
+  ! MUL             [ shift and go to state 55 ]
+  ! DIV             [ shift and go to state 56 ]
+  ! ADDE            [ shift and go to state 57 ]
+  ! SUB             [ shift and go to state 58 ]
+
+
+state 62
+
+    (38) mathexpr -> LPAREN mathexpr . RPAREN
+    (33) mathexpr -> mathexpr . MUL mathexpr
+    (34) mathexpr -> mathexpr . DIV mathexpr
+    (35) mathexpr -> mathexpr . ADDE mathexpr
+    (36) mathexpr -> mathexpr . SUB mathexpr
+    (37) mathexpr -> mathexpr . POW mathexpr
+
+    RPAREN          shift and go to state 79
+    MUL             shift and go to state 55
+    DIV             shift and go to state 56
+    ADDE            shift and go to state 57
+    SUB             shift and go to state 58
+    POW             shift and go to state 59
+
+
+state 63
+
+    (26) stmt -> IDSTR AS IDSTR .
+
+    NEWLINE         reduce using rule 26 (stmt -> IDSTR AS IDSTR .)
+    $end            reduce using rule 26 (stmt -> IDSTR AS IDSTR .)
+
+
+state 64
+
+    (49) IDSTR -> ID .
+
+    NEWLINE         reduce using rule 49 (IDSTR -> ID .)
+    $end            reduce using rule 49 (IDSTR -> ID .)
+
+
+state 65
+
+    (27) stmt -> ID LBRACK INT . RBRACK EQ VAL
+    (29) stmt -> ID LBRACK INT . RBRACK
+
+    RBRACK          shift and go to state 80
+
+
+state 66
+
+    (28) stmt -> ID EQ VAL .
+
+    NEWLINE         reduce using rule 28 (stmt -> ID EQ VAL .)
+    $end            reduce using rule 28 (stmt -> ID EQ VAL .)
+
+
+state 67
+
+    (46) VAL -> STR .
+
+    NEWLINE         reduce using rule 46 (VAL -> STR .)
+    $end            reduce using rule 46 (VAL -> STR .)
+
+
+state 68
+
+    (47) VAL -> TOP .
+
+    NEWLINE         reduce using rule 47 (VAL -> TOP .)
+    $end            reduce using rule 47 (VAL -> TOP .)
+
+
+state 69
+
+    (48) VAL -> mathexpr .
+    (33) mathexpr -> mathexpr . MUL mathexpr
+    (34) mathexpr -> mathexpr . DIV mathexpr
+    (35) mathexpr -> mathexpr . ADDE mathexpr
+    (36) mathexpr -> mathexpr . SUB mathexpr
+    (37) mathexpr -> mathexpr . POW mathexpr
+
+    NEWLINE         reduce using rule 48 (VAL -> mathexpr .)
+    $end            reduce using rule 48 (VAL -> mathexpr .)
+    MUL             shift and go to state 55
+    DIV             shift and go to state 56
+    ADDE            shift and go to state 57
+    SUB             shift and go to state 58
+    POW             shift and go to state 59
+
+
+state 70
+
+    (31) stmt -> CONST ID EQ . VAL
+    (46) VAL -> . STR
+    (47) VAL -> . TOP
+    (48) VAL -> . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
+
+    STR             shift and go to state 67
+    TOP             shift and go to state 68
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
+
+    VAL                            shift and go to state 81
+    mathexpr                       shift and go to state 69
+
+state 71
+
+    (5) enter -> BUILD ID LBRACE .
+
+    NEWLINE         reduce using rule 5 (enter -> BUILD ID LBRACE .)
+
+
+state 72
+
+    (12) block -> enter NEWLINE expressions NEWLINE . RBRACE
+    (1) expressions -> expressions NEWLINE . block
+    (2) expressions -> expressions NEWLINE . stmt
+    (12) block -> . enter NEWLINE expressions NEWLINE RBRACE
+    (13) stmt -> . AXE
+    (14) stmt -> . CHICKEN
+    (15) stmt -> . ADD
+    (16) stmt -> . FOX
+    (17) stmt -> . ROOSTER
+    (18) stmt -> . COMPARE
+    (19) stmt -> . PICK
+    (20) stmt -> . PECK
+    (21) stmt -> . FR
+    (22) stmt -> . BBQ
+    (23) stmt -> . HATCH FUNC
+    (24) stmt -> . PUSH STR
+    (25) stmt -> . PUSH mathexpr
+    (26) stmt -> . IDSTR AS IDSTR
+    (27) stmt -> . ID LBRACK INT RBRACK EQ VAL
+    (28) stmt -> . ID EQ VAL
+    (29) stmt -> . ID LBRACK INT RBRACK
+    (30) stmt -> . ID
+    (31) stmt -> . CONST ID EQ VAL
+    (32) stmt -> .
+    (5) enter -> . BUILD ID LBRACE
+    (6) enter -> . LOOPT LBRACE
+    (7) enter -> . LOOPF LBRACE
+    (8) enter -> . REPT LBRACE
+    (9) enter -> . REPF LBRACE
+    (10) enter -> . IFT LBRACE
+    (11) enter -> . IFF LBRACE
+    (49) IDSTR -> . ID
+    (50) IDSTR -> . STR
+
+    RBRACE          shift and go to state 82
+    AXE             shift and go to state 5
+    CHICKEN         shift and go to state 6
+    ADD             shift and go to state 7
+    FOX             shift and go to state 8
+    ROOSTER         shift and go to state 9
+    COMPARE         shift and go to state 10
+    PICK            shift and go to state 11
+    PECK            shift and go to state 12
+    FR              shift and go to state 13
+    BBQ             shift and go to state 14
+    HATCH           shift and go to state 15
+    PUSH            shift and go to state 16
+    ID              shift and go to state 19
+    CONST           shift and go to state 20
+    NEWLINE         reduce using rule 32 (stmt -> .)
+    BUILD           shift and go to state 21
+    LOOPT           shift and go to state 22
+    LOOPF           shift and go to state 23
+    REPT            shift and go to state 24
+    REPF            shift and go to state 25
+    IFT             shift and go to state 26
+    IFF             shift and go to state 27
+    STR             shift and go to state 17
+
+    enter                          shift and go to state 4
+    block                          shift and go to state 51
+    stmt                           shift and go to state 52
+    IDSTR                          shift and go to state 18
+
+state 73
+
+    (44) FUNC -> ID DOT FUNC .
+
+    NEWLINE         reduce using rule 44 (FUNC -> ID DOT FUNC .)
+    $end            reduce using rule 44 (FUNC -> ID DOT FUNC .)
+
+
+state 74
+
+    (33) mathexpr -> mathexpr MUL mathexpr .
+    (33) mathexpr -> mathexpr . MUL mathexpr
+    (34) mathexpr -> mathexpr . DIV mathexpr
+    (35) mathexpr -> mathexpr . ADDE mathexpr
+    (36) mathexpr -> mathexpr . SUB mathexpr
+    (37) mathexpr -> mathexpr . POW mathexpr
+
+    MUL             reduce using rule 33 (mathexpr -> mathexpr MUL mathexpr .)
+    DIV             reduce using rule 33 (mathexpr -> mathexpr MUL mathexpr .)
+    ADDE            reduce using rule 33 (mathexpr -> mathexpr MUL mathexpr .)
+    SUB             reduce using rule 33 (mathexpr -> mathexpr MUL mathexpr .)
+    NEWLINE         reduce using rule 33 (mathexpr -> mathexpr MUL mathexpr .)
+    $end            reduce using rule 33 (mathexpr -> mathexpr MUL mathexpr .)
+    RPAREN          reduce using rule 33 (mathexpr -> mathexpr MUL mathexpr .)
+    POW             shift and go to state 59
+
+  ! POW             [ reduce using rule 33 (mathexpr -> mathexpr MUL mathexpr .) ]
+  ! MUL             [ shift and go to state 55 ]
+  ! DIV             [ shift and go to state 56 ]
+  ! ADDE            [ shift and go to state 57 ]
+  ! SUB             [ shift and go to state 58 ]
+
+
+state 75
+
+    (34) mathexpr -> mathexpr DIV mathexpr .
+    (33) mathexpr -> mathexpr . MUL mathexpr
+    (34) mathexpr -> mathexpr . DIV mathexpr
+    (35) mathexpr -> mathexpr . ADDE mathexpr
+    (36) mathexpr -> mathexpr . SUB mathexpr
+    (37) mathexpr -> mathexpr . POW mathexpr
+
+    MUL             reduce using rule 34 (mathexpr -> mathexpr DIV mathexpr .)
+    DIV             reduce using rule 34 (mathexpr -> mathexpr DIV mathexpr .)
+    ADDE            reduce using rule 34 (mathexpr -> mathexpr DIV mathexpr .)
+    SUB             reduce using rule 34 (mathexpr -> mathexpr DIV mathexpr .)
+    NEWLINE         reduce using rule 34 (mathexpr -> mathexpr DIV mathexpr .)
+    $end            reduce using rule 34 (mathexpr -> mathexpr DIV mathexpr .)
+    RPAREN          reduce using rule 34 (mathexpr -> mathexpr DIV mathexpr .)
+    POW             shift and go to state 59
+
+  ! POW             [ reduce using rule 34 (mathexpr -> mathexpr DIV mathexpr .) ]
+  ! MUL             [ shift and go to state 55 ]
+  ! DIV             [ shift and go to state 56 ]
+  ! ADDE            [ shift and go to state 57 ]
+  ! SUB             [ shift and go to state 58 ]
+
+
+state 76
+
+    (35) mathexpr -> mathexpr ADDE mathexpr .
+    (33) mathexpr -> mathexpr . MUL mathexpr
+    (34) mathexpr -> mathexpr . DIV mathexpr
+    (35) mathexpr -> mathexpr . ADDE mathexpr
+    (36) mathexpr -> mathexpr . SUB mathexpr
+    (37) mathexpr -> mathexpr . POW mathexpr
+
+    ADDE            reduce using rule 35 (mathexpr -> mathexpr ADDE mathexpr .)
+    SUB             reduce using rule 35 (mathexpr -> mathexpr ADDE mathexpr .)
+    NEWLINE         reduce using rule 35 (mathexpr -> mathexpr ADDE mathexpr .)
+    $end            reduce using rule 35 (mathexpr -> mathexpr ADDE mathexpr .)
+    RPAREN          reduce using rule 35 (mathexpr -> mathexpr ADDE mathexpr .)
+    MUL             shift and go to state 55
+    DIV             shift and go to state 56
+    POW             shift and go to state 59
+
+  ! MUL             [ reduce using rule 35 (mathexpr -> mathexpr ADDE mathexpr .) ]
+  ! DIV             [ reduce using rule 35 (mathexpr -> mathexpr ADDE mathexpr .) ]
+  ! POW             [ reduce using rule 35 (mathexpr -> mathexpr ADDE mathexpr .) ]
+  ! ADDE            [ shift and go to state 57 ]
+  ! SUB             [ shift and go to state 58 ]
+
+
+state 77
+
+    (36) mathexpr -> mathexpr SUB mathexpr .
+    (33) mathexpr -> mathexpr . MUL mathexpr
+    (34) mathexpr -> mathexpr . DIV mathexpr
+    (35) mathexpr -> mathexpr . ADDE mathexpr
+    (36) mathexpr -> mathexpr . SUB mathexpr
+    (37) mathexpr -> mathexpr . POW mathexpr
+
+    ADDE            reduce using rule 36 (mathexpr -> mathexpr SUB mathexpr .)
+    SUB             reduce using rule 36 (mathexpr -> mathexpr SUB mathexpr .)
+    NEWLINE         reduce using rule 36 (mathexpr -> mathexpr SUB mathexpr .)
+    $end            reduce using rule 36 (mathexpr -> mathexpr SUB mathexpr .)
+    RPAREN          reduce using rule 36 (mathexpr -> mathexpr SUB mathexpr .)
+    MUL             shift and go to state 55
+    DIV             shift and go to state 56
+    POW             shift and go to state 59
+
+  ! MUL             [ reduce using rule 36 (mathexpr -> mathexpr SUB mathexpr .) ]
+  ! DIV             [ reduce using rule 36 (mathexpr -> mathexpr SUB mathexpr .) ]
+  ! POW             [ reduce using rule 36 (mathexpr -> mathexpr SUB mathexpr .) ]
+  ! ADDE            [ shift and go to state 57 ]
+  ! SUB             [ shift and go to state 58 ]
+
+
+state 78
+
+    (37) mathexpr -> mathexpr POW mathexpr .
+    (33) mathexpr -> mathexpr . MUL mathexpr
+    (34) mathexpr -> mathexpr . DIV mathexpr
+    (35) mathexpr -> mathexpr . ADDE mathexpr
+    (36) mathexpr -> mathexpr . SUB mathexpr
+    (37) mathexpr -> mathexpr . POW mathexpr
+
+    MUL             reduce using rule 37 (mathexpr -> mathexpr POW mathexpr .)
+    DIV             reduce using rule 37 (mathexpr -> mathexpr POW mathexpr .)
+    ADDE            reduce using rule 37 (mathexpr -> mathexpr POW mathexpr .)
+    SUB             reduce using rule 37 (mathexpr -> mathexpr POW mathexpr .)
+    NEWLINE         reduce using rule 37 (mathexpr -> mathexpr POW mathexpr .)
+    $end            reduce using rule 37 (mathexpr -> mathexpr POW mathexpr .)
+    RPAREN          reduce using rule 37 (mathexpr -> mathexpr POW mathexpr .)
+    POW             shift and go to state 59
+
+  ! POW             [ reduce using rule 37 (mathexpr -> mathexpr POW mathexpr .) ]
+  ! MUL             [ shift and go to state 55 ]
+  ! DIV             [ shift and go to state 56 ]
+  ! ADDE            [ shift and go to state 57 ]
+  ! SUB             [ shift and go to state 58 ]
+
+
+state 79
+
+    (38) mathexpr -> LPAREN mathexpr RPAREN .
+
+    MUL             reduce using rule 38 (mathexpr -> LPAREN mathexpr RPAREN .)
+    DIV             reduce using rule 38 (mathexpr -> LPAREN mathexpr RPAREN .)
+    ADDE            reduce using rule 38 (mathexpr -> LPAREN mathexpr RPAREN .)
+    SUB             reduce using rule 38 (mathexpr -> LPAREN mathexpr RPAREN .)
+    POW             reduce using rule 38 (mathexpr -> LPAREN mathexpr RPAREN .)
+    NEWLINE         reduce using rule 38 (mathexpr -> LPAREN mathexpr RPAREN .)
+    $end            reduce using rule 38 (mathexpr -> LPAREN mathexpr RPAREN .)
+    RPAREN          reduce using rule 38 (mathexpr -> LPAREN mathexpr RPAREN .)
+
+
+state 80
+
+    (27) stmt -> ID LBRACK INT RBRACK . EQ VAL
+    (29) stmt -> ID LBRACK INT RBRACK .
+
+    EQ              shift and go to state 83
+    NEWLINE         reduce using rule 29 (stmt -> ID LBRACK INT RBRACK .)
+    $end            reduce using rule 29 (stmt -> ID LBRACK INT RBRACK .)
+
+
+state 81
+
+    (31) stmt -> CONST ID EQ VAL .
+
+    NEWLINE         reduce using rule 31 (stmt -> CONST ID EQ VAL .)
+    $end            reduce using rule 31 (stmt -> CONST ID EQ VAL .)
+
+
+state 82
+
+    (12) block -> enter NEWLINE expressions NEWLINE RBRACE .
+
+    NEWLINE         reduce using rule 12 (block -> enter NEWLINE expressions NEWLINE RBRACE .)
+    $end            reduce using rule 12 (block -> enter NEWLINE expressions NEWLINE RBRACE .)
+
+
+state 83
+
+    (27) stmt -> ID LBRACK INT RBRACK EQ . VAL
+    (46) VAL -> . STR
+    (47) VAL -> . TOP
+    (48) VAL -> . mathexpr
+    (33) mathexpr -> . mathexpr MUL mathexpr
+    (34) mathexpr -> . mathexpr DIV mathexpr
+    (35) mathexpr -> . mathexpr ADDE mathexpr
+    (36) mathexpr -> . mathexpr SUB mathexpr
+    (37) mathexpr -> . mathexpr POW mathexpr
+    (38) mathexpr -> . LPAREN mathexpr RPAREN
+    (39) mathexpr -> . SUB mathexpr
+    (40) mathexpr -> . ADDE mathexpr
+    (41) mathexpr -> . INT
+    (42) mathexpr -> . FLOAT
+    (43) mathexpr -> . ID
+
+    STR             shift and go to state 67
+    TOP             shift and go to state 68
+    LPAREN          shift and go to state 36
+    SUB             shift and go to state 35
+    ADDE            shift and go to state 34
+    INT             shift and go to state 37
+    FLOAT           shift and go to state 38
+    ID              shift and go to state 39
+
+    VAL                            shift and go to state 84
+    mathexpr                       shift and go to state 69
+
+state 84
+
+    (27) stmt -> ID LBRACK INT RBRACK EQ VAL .
+
+    NEWLINE         reduce using rule 27 (stmt -> ID LBRACK INT RBRACK EQ VAL .)
+    $end            reduce using rule 27 (stmt -> ID LBRACK INT RBRACK EQ VAL .)
 

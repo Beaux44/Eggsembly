@@ -6,6 +6,7 @@ from pprint import pprint
         Take OOP too far
         Make it do anything
         Come up with better while notation
+        Make blocks work
 """
 
 nonExistentFileName = ""
@@ -80,6 +81,12 @@ class Block(object):
         return self.code.__iter__()
 
 
+class Const(object):
+    def __init__(self, ID, VAL):
+        self.ID = ID
+        self.VAL = VAL
+
+
 class EggLex(object):
     def __init__(self, **kwargs):
         self.lexer = lex.lex(module=self, **kwargs)
@@ -108,7 +115,7 @@ class EggLex(object):
 
     def t_error(self, t):
         cprint(ERROR,
-               ("Syntax Error in file %r on line %d, column %d:\n"
+               ("Invalid symbol in file %r on line %d, column %d:\n"
                 "\t%s\n\t") % (nonExistentFileName,
                                t.lexer.lineno,
                                self.findColumn(t),
@@ -137,7 +144,8 @@ class EggLex(object):
         'repeat_true': 'REPT',
         'repeat_false': 'REPF',
         'if_true': 'IFT',
-        'if_alse': 'IFF',
+        'if_false': 'IFF',
+        'const': 'CONST',
     }
 
     tokens = ['INT',
@@ -145,6 +153,11 @@ class EggLex(object):
               'ID',
               'EQ',
               'DOT',
+              'ADDE',
+              'SUB',
+              'DIV',
+              'MUL',
+              'POW',
               'FLOAT',
               'LPAREN',
               'LBRACE',
@@ -160,15 +173,21 @@ class EggLex(object):
 
     t_ignore = ' \t'
 
-    literals = "()[]{}.="
+    literals = "()[]{}.=/+-*^"
     t_EQ = r'='
     t_DOT = r'\.'
+    t_ADD = r'\+'
+    t_SUB = r'-'
+    t_MUL = r'\*'
+    t_DIV = r'/'
+    t_POW = r'\^'
     t_LPAREN = r'\('
     t_LBRACE = r'{'
     t_LBRACK = r'\['
     t_RPAREN = r'\)'
     t_RBRACE = r'}'
     t_RBRACK = r']'
+
 
     def t_NEWLINE(self, t):
         r'(?:\r?\n)+'
@@ -177,19 +196,19 @@ class EggLex(object):
         t.value = t.value.count("\n")
         return t
 
-    def t_ID(self, t):
-        r'\b([A-Za-z_][A-Za-z0-9_]*)\b'
-        t.type = self.reserved.get(t.value, 'ID')
+    def t_FLOAT(self, t):
+        r'(?:\d+\.\d*|\d*\.\d+)'
+        t.value = float(t.value)
         return t
 
     def t_INT(self, t):
-        r'\b\d+\b'
+        r'\b\d+'
         t.value = int(t.value)
         return t
 
-    def t_FLOAT(self, t):
-        r'(?:\b\d+\.\d*|\d*\.\d+\b)'
-        t.value = float(t.value)
+    def t_ID(self, t):
+        r'\b([A-Za-z_][A-Za-z0-9_]*)\b'
+        t.type = self.reserved.get(t.value, 'ID')
         return t
 
     t_STR = r'(?P<quote>["\'])(?P<str>(?:(?=(?P<slash>\\?))(?P=slash)[ -~])+?)(?P=quote)'
@@ -210,6 +229,7 @@ class EggParse(object):
     def __init__(self, **kwargs):
         self.vars = {}
         self.funcs = {}
+        self.consts = {}
         self.lexer = EggLex()
         self.parser = yacc.yacc(module=self, **kwargs)
         self.parser.lineno = 1
@@ -220,6 +240,14 @@ class EggParse(object):
 
     tokens = EggLex.tokens
 
+    precedence = (
+        ('nonassoc', 'EQ'),
+        ('left', 'ADDE', 'SUB'),
+        ('left', 'MUL', 'DIV'),
+        ('right', 'NEG', 'POS'),
+        ('right', 'POW')
+    )
+
     def p_ignore(self, p):
         " \t"
 
@@ -227,12 +255,11 @@ class EggParse(object):
         cprint(ERROR, "Syntax error on line %d:\n\t%s" % (self.lexer.lineno,
                                                           self.data.split("\n")[self.lexer.lineno - 1].strip()))
 
-    def p_expressions_program(self, p):
+    def p_program(self, p):
         """expressions : expressions NEWLINE block
-                       | expressions NEWLINE statement
+                       | expressions NEWLINE stmt
                        | block
-                       | statement
-                       | NEWLINE
+                       | stmt
         """
         if len(p) == 4:
             p[0] = flatten([p[1], p[3]])
@@ -267,56 +294,108 @@ class EggParse(object):
         "enter : IFF LBRACE"
         p[0] = Command("IF", "FALSE")
 
-    def p_expression_block(self, p):
-        "block : enter NEWLINE expressions NEWLINE RBRACE"
+    def p_block(self, p):
+        """block : enter NEWLINE expressions NEWLINE RBRACE"""
         p[0] = Block(p[1], p[3])
 
-    def p_statement_keyword(self, p):
-        """statement : AXE
-                     | CHICKEN
-                     | ADD
-                     | FOX
-                     | ROOSTER
-                     | COMPARE
-                     | PICK
-                     | PECK
-                     | FR
-                     | BBQ
+    def p_stmt_keyword(self, p):
+        """stmt : AXE
+                | CHICKEN
+                | ADD
+                | FOX
+                | ROOSTER
+                | COMPARE
+                | PICK
+                | PECK
+                | FR
+                | BBQ
         """
         p[0] = Command(p[1].upper())
 
-    def p_statement_HATCH(self, p):
-        "statement : HATCH FUNC"
+    def p_stmt_HATCH(self, p):
+        "stmt : HATCH FUNC"
         p[0] = Command("HATCH", p[2])
 
-    def p_statement_PUSH(self, p):
-        """statement : PUSH STR
-                     | PUSH INT
-                     | PUSH FLOAT
+    def p_stmt_PUSH(self, p):
+        """stmt : PUSH STR
+                | PUSH mathexpr
         """
         p[0] = Command("PUSH", None, None, p[2])
 
-    def p_statement_AS(self, p):
-        "statement : IDSTR AS IDSTR"
+    def p_stmt_AS(self, p):
+        "stmt : IDSTR AS IDSTR"
         p[0] = Command("AS", (p[1], p[3]))
 
-    def p_statement_SETVAR(self, p):
-        """statement : ID LBRACK INT RBRACK EQ VAL
-                     | ID EQ VAL
+    def p_stmt_SETVAR(self, p):
+        """stmt : ID LBRACK INT RBRACK EQ VAL
+                | ID EQ VAL
         """
         if len(p) == 7:
             p[0] = Command("SET", p[1], p[3], p[6])
         else:
             p[0] = Command("SET", p[1], None, p[3])
 
-    def p_statement_GETVAR(self, p):
-        """statement : ID LBRACK INT RBRACK
-                     | ID
+    def p_stmt_GETVAR(self, p):
+        """stmt : ID LBRACK INT RBRACK
+                | ID
         """
         if len(p) == 5:
             p[0] = Command("GET", p[1], p[3])
         else:
             p[0] = Command("GET", p[1])
+
+    def p_stmt_SETCONST(self, p):
+        """stmt : CONST ID EQ VAL"""
+        self.consts[p[2]] = p[4]
+
+    def p_stmt_BLANK(self, p):
+        "stmt : "
+
+    def p_expr_MUL(self, p):
+        """mathexpr : mathexpr MUL mathexpr"""
+        p[0] = p[1] * p[3]
+    
+    def p_expr_DIV(self, p):
+        """mathexpr : mathexpr DIV mathexpr"""
+        if isinstance(p[1], float) or isinstance(p[3], float):
+            p[0] = p[1] / p[3]
+        else:
+            p[0] = p[1] // p[3]
+    
+    def p_expr_ADDE(self, p):
+        """mathexpr : mathexpr ADDE mathexpr"""
+        p[0] = p[1] + p[3]
+
+    def p_expr_SUB(self, p):
+        """mathexpr : mathexpr SUB mathexpr"""
+        p[0] = p[1] - p[3]
+    
+    def p_expr_POW(self, p):
+        """mathexpr : mathexpr POW mathexpr"""
+        p[0] = p[1]**p[3]
+
+    def p_expr_PARENMATH(self, p):
+        """mathexpr : LPAREN mathexpr RPAREN"""
+        p[0] = p[2]
+
+    def p_expr_NEG(self, p):
+        """mathexpr : SUB mathexpr %prec NEG"""
+        p[0] = -p[2]
+
+    def p_expr_POS(self, p):
+        """mathexpr : ADDE mathexpr %prec POS"""
+        p[0] = p[2]
+
+    def p_expr_MATH(self, p):
+        """mathexpr : INT
+                    | FLOAT
+        """
+        p[0] = p[1]
+
+    def p_expr_MATHVAR(self, p):
+        "mathexpr : ID"
+        p[0] = self.consts[p[1]]
+
 
     def p_FUNCTION(self, p):
         """FUNC : ID DOT FUNC
@@ -326,9 +405,8 @@ class EggParse(object):
 
     def p_VAL(self, p):
         """VAL : STR
-               | INT
                | TOP
-               | FLOAT
+               | mathexpr
         """
         p[0] = p[1]
 
@@ -338,35 +416,16 @@ class EggParse(object):
         """
         p[0] = p[1]
 
-    # def p_OPTNEWLINE(self, p):
-    #     """OPTNEWLINE : NEWLINE
-    #                   |
-    #     """
-
 
 lexer = EggLex()
 parser = EggParse()
 
-print(*lexer(
-    "a as b\n"
-    "x as y \n"
-    "build blah {\n"
-    "\thatch ab.a\n"
-    "\ta[2] = '3'\n"
-    "\ta\n"
-    "\tif_true {\n"
-    "\t\tloop_false {\n"
-    "\t\t\tb[3] = Top\n"
-    "\t\t}\n"
-    "\t}\n"
-    "\tb\n"
-    "\tpush 3\n"
-    "\trooster\n"
-    "\ta = Top\n"
-    "} // blah"
-), "", sep="\n")
-
-pprint(parser(
+from time import time_ns
+start = time_ns()
+print(*map(lambda a: f"Line {a[0]}: {a[1]}", enumerate(lexer(
+    "push 4 + 3.5\n"
+    "push 4*3*4^2\n"
+    "push -3^4\n"
     "a as b\n"
     "x as y\n"
     "build blah {\n"
@@ -383,5 +442,35 @@ pprint(parser(
     "\tpush 3\n"
     "\trooster\n"
     "\ta = Top\n"
-    "} // blah", debug=0
+    "} // blah"
+), 1)), sep="\n")
+end = time_ns()
+print("\nTook", (end - start) / 10**6, "milliseconds\n\n")
+
+start = time_ns()
+pprint(parser(
+    "const foo = 4\n"
+    "push -foo^3\n"
+    "push ((2-1)^3)^4\n"
+    "push (4*3*4^2)\n"
+    "a as b\n"
+    "x as y\n"
+    "bar = 4*3/2.0^2\n"
+    "build baz {\n"
+    "   hatch ab.a\n"
+    "   a[2] = '3'\n"
+    "   a\n"
+    "   if_true {\n"
+    "       loop_false {\n"
+    "           b = Top\n"
+    "       }\n"
+    "   }\n"
+    "   b\n"
+    "\n"
+    "   push 3\n"
+    "   rooster\n"
+    "   a = Top\n"
+    "} // blah\n", debug=0
 ))
+end = time_ns()
+print("Took", (end - start) / 10**6, "milliseconds")

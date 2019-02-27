@@ -1,5 +1,6 @@
 // BNF description of Eggsembly syntax
 // Still up for change, though
+// Not currently correct as per the new parser
 
 <syntax>     ::=  <optionalWs> <line> | <syntax> <endline> <syntax>
 <line>       ::=  <keyword>
