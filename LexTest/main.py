@@ -1,4 +1,4 @@
-import ply.lex  as lex, ply.yacc as yacc
+import ply.lex as lex, ply.yacc as yacc
 from pprint import pprint
 
 """
@@ -67,7 +67,7 @@ class Block(object):
         self.code: list = code
 
     def __repr__(self):
-        return "Block(%r, code)" % self.type
+        return "Block(%r, code)" % (self.type,)
 
     def __str__(self):
         if self.type.type == "BUILD":
@@ -207,7 +207,7 @@ class EggLex(object):
         return t
 
     def t_ID(self, t):
-        r'\b([A-Za-z_][A-Za-z0-9_]*)\b'
+        r'\b([A-Za-z_]\w*)\b'
         t.type = self.reserved.get(t.value, 'ID')
         return t
 
@@ -236,7 +236,7 @@ class EggParse(object):
 
     def __call__(self, data, **kwargs):
         self.data = self.lexer.data = data
-        return self.parser.parse(self.data, **kwargs)
+        return self.parser.parse(self.data, lexer=self.lexer.lexer, **kwargs)
 
     tokens = EggLex.tokens
 
@@ -244,6 +244,7 @@ class EggParse(object):
         ('nonassoc', 'EQ'),
         ('left', 'ADDE', 'SUB'),
         ('left', 'MUL', 'DIV'),
+        # ('right', 'IMPMUL'),
         ('right', 'NEG', 'POS'),
         ('right', 'POW')
     )
@@ -267,32 +268,32 @@ class EggParse(object):
             p[0] = p[1]
 
     def p_enter_block_build(self, p):
-        "enter : BUILD ID LBRACE"
-        p[0] = Command("BUILD", p[2])
+        "enter : BUILD FUNC LBRACE"
+        p[0] = ("BUILD", p[2])
 
     def p_enter_block_loopt(self, p):
         "enter : LOOPT LBRACE"
-        p[0] = Command("LOOP", "TRUE")
+        p[0] = ("LOOP", "TRUE")
 
     def p_enter_block_loopf(self, p):
         "enter : LOOPF LBRACE"
-        p[0] = Command("LOOP", "FALSE")
+        p[0] = ("LOOP", "FALSE")
 
     def p_enter_block_rept(self, p):
         "enter : REPT LBRACE"
-        p[0] = Command("REPEAT", "TRUE")
+        p[0] = ("REPEAT", "TRUE")
 
     def p_enter_block_repf(self, p):
         "enter : REPF LBRACE"
-        p[0] = Command("REPEAT", "FALSE")
+        p[0] = ("REPEAT", "FALSE")
 
     def p_enter_block_ift(self, p):
         "enter : IFT LBRACE"
-        p[0] = Command("IF", "TRUE")
+        p[0] = ("IF", "TRUE")
 
     def p_enter_block_iff(self, p):
         "enter : IFF LBRACE"
-        p[0] = Command("IF", "FALSE")
+        p[0] = ("IF", "FALSE")
 
     def p_block(self, p):
         """block : enter NEWLINE expressions NEWLINE RBRACE"""
@@ -348,13 +349,17 @@ class EggParse(object):
         """stmt : CONST ID EQ VAL"""
         self.consts[p[2]] = p[4]
 
-    def p_stmt_BLANK(self, p):
+    def p_stmt_BLANKLINE(self, p):
         "stmt : "
 
     def p_expr_MUL(self, p):
         """mathexpr : mathexpr MUL mathexpr"""
         p[0] = p[1] * p[3]
-    
+
+    # def p_expr_IMPMUL(self, p):
+    #     """mathexpr : mathexpr LPAREN mathexpr RPAREN %prec IMPMUL"""
+    #     p[0] = p[1] * p[3]
+
     def p_expr_DIV(self, p):
         """mathexpr : mathexpr DIV mathexpr"""
         if isinstance(p[1], float) or isinstance(p[3], float):
@@ -393,7 +398,7 @@ class EggParse(object):
         p[0] = p[1]
 
     def p_expr_MATHVAR(self, p):
-        "mathexpr : ID"
+        """mathexpr : ID"""
         p[0] = self.consts[p[1]]
 
 
@@ -423,40 +428,17 @@ parser = EggParse()
 from time import time_ns
 start = time_ns()
 print(*map(lambda a: f"Line {a[0]}: {a[1]}", enumerate(lexer(
-    "push 4 + 3.5\n"
-    "push 4*3*4^2\n"
-    "push -3^4\n"
+    "const foo = 2^4 / 4\n"
+    "const bar = 3\n"
+    "push -foo^bar\n"
+    "push foo\n"
+    "push ((2-1)^bar)^foo\n"
+    "push foo*bar*foo^2\n"
+    "push bar*foo*bar*foo\n"
     "a as b\n"
     "x as y\n"
-    "build blah {\n"
-    "\thatch ab.a\n"
-    "\ta[2] = '3'\n"
-    "\ta\n"
-    "\tif_true {\n"
-    "\t\tloop_false {\n"
-    "\t\t\tb[3] = Top\n"
-    "\t\t}\n"
-    "\t}\n"
-    "\tb\n"
-    "\n"
-    "\tpush 3\n"
-    "\trooster\n"
-    "\ta = Top\n"
-    "} // blah"
-), 1)), sep="\n")
-end = time_ns()
-print("\nTook", (end - start) / 10**6, "milliseconds\n\n")
-
-start = time_ns()
-pprint(parser(
-    "const foo = 4\n"
-    "push -foo^3\n"
-    "push ((2-1)^3)^4\n"
-    "push (4*3*4^2)\n"
-    "a as b\n"
-    "x as y\n"
-    "bar = 4*3/2.0^2\n"
-    "build baz {\n"
+    "baz = foo*bar/2.0^2\n"
+    "build qux {\n"
     "   hatch ab.a\n"
     "   a[2] = '3'\n"
     "   a\n"
@@ -467,10 +449,95 @@ pprint(parser(
     "   }\n"
     "   b\n"
     "\n"
-    "   push 3\n"
+    "   push foo\n"
     "   rooster\n"
     "   a = Top\n"
-    "} // blah\n", debug=0
-))
+    "} // blah\n"
+    "if_false {\n"
+    "   push bar\n"
+    "}\n"
+    "if_true {\n"
+    "   push foo\n"
+    "}\n"
+    "loop_true {\n"
+    "   push 2\n"
+    "}\n"
+    "loop_false {\n"
+    "   push 1\n"
+    "}\n"
+    "repeat_true {\n"
+    "   push 0\n"
+    "}\n"
+    "repeat_false {\n"
+    "   push -1\n"
+    "}\n"
+    "\n"
+), 1)), sep="\n")
 end = time_ns()
-print("Took", (end - start) / 10**6, "milliseconds")
+print("\nTook", (end - start) / 10**6, "milliseconds\n\n")
+
+start = time_ns()
+pprint(parser(
+    "const foo = 2^4 / 4\n"
+    "const bar = 3\n"
+    "push -foo^bar\n"
+    "push foo\n"
+    "push ((2-1)^bar)^foo\n"
+    "push foo*bar*foo^2\n"
+    "push bar*foo*bar*foo\n"
+    "a as b\n"
+    "x as y\n"
+    "baz = foo*bar/2.0^2\n"
+    "build qux {\n"
+    "   hatch ab.a\n"
+    "   a[2] = '3'\n"
+    "   a\n"
+    "   if_true {\n"
+    "       loop_false {\n"
+    "           b = Top\n"
+    "       }\n"
+    "   }\n"
+    "   b\n"
+    "\n"
+    "   push foo\n"
+    "   rooster\n"
+    "   a = Top\n"
+    "} // blah\n"
+    "if_false {\n"
+    "   push bar\n"
+    "}\n"
+    "if_true {\n"
+    "   push foo\n"
+    "}\n"
+    "loop_true {\n"
+    "   push 2\n"
+    "}\n"
+    "loop_false {\n"
+    "   push 1\n"
+    "}\n"
+    "repeat_true {\n"
+    "   push 0\n"
+    "}\n"
+    "repeat_false {\n"
+    "   push -1\n"
+    "}\n"
+    "\n", debug=0
+))  # -->
+#        [Command('PUSH', None, None, -64),
+#         Command('PUSH', None, None, 4),
+#         Command('PUSH', None, None, 1),
+#         Command('PUSH', None, None, 192),
+#         Command('PUSH', None, None, 144),
+#         Command('AS', ('a', 'b'), None, None),
+#         Command('AS', ('x', 'y'), None, None),
+#         Command('SET', 'baz', None, 3.0),
+#         Block(('BUILD', 'qux'), code),
+#         Block(('IF', 'FALSE'), code),
+#         Block(('IF', 'TRUE'), code),
+#         Block(('LOOP', 'TRUE'), code),
+#         Block(('LOOP', 'FALSE'), code),
+#         Block(('REPEAT', 'TRUE'), code),
+#         Block(('REPEAT', 'FALSE'), code)]
+
+end = time_ns()
+print("\nTook", (end - start) / 10**6, "milliseconds")

@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'nonassocEQleftADDESUBleftMULDIVrightNEGPOSrightPOWADD ADDE AS AXE BBQ BUILD CHICKEN COMPARE CONST DIV DOT EQ FLOAT FOX FR HATCH ID IFF IFT INT LBRACE LBRACK LOOPF LOOPT LPAREN MUL NEWLINE PECK PICK POW PUSH RBRACE RBRACK REPF REPT ROOSTER RPAREN STR SUB TOP \texpressions : expressions NEWLINE block\n                       | expressions NEWLINE stmt\n                       | block\n                       | stmt\n        enter : BUILD ID LBRACEenter : LOOPT LBRACEenter : LOOPF LBRACEenter : REPT LBRACEenter : REPF LBRACEenter : IFT LBRACEenter : IFF LBRACEblock : enter NEWLINE expressions NEWLINE RBRACEstmt : AXE\n                | CHICKEN\n                | ADD\n                | FOX\n                | ROOSTER\n                | COMPARE\n                | PICK\n                | PECK\n                | FR\n                | BBQ\n        stmt : HATCH FUNCstmt : PUSH STR\n                | PUSH mathexpr\n        stmt : IDSTR AS IDSTRstmt : ID LBRACK INT RBRACK EQ VAL\n                | ID EQ VAL\n        stmt : ID LBRACK INT RBRACK\n                | ID\n        stmt : CONST ID EQ VALstmt : mathexpr : mathexpr MUL mathexprmathexpr : mathexpr DIV mathexprmathexpr : mathexpr ADDE mathexprmathexpr : mathexpr SUB mathexprmathexpr : mathexpr POW mathexprmathexpr : LPAREN mathexpr RPARENmathexpr : SUB mathexpr %prec NEGmathexpr : ADDE mathexpr %prec POSmathexpr : INT\n                    | FLOAT\n        mathexpr : IDFUNC : ID DOT FUNC\n                | ID\n        VAL : STR\n               | TOP\n               | mathexpr\n        IDSTR : ID\n                 | STR\n        '
+_lr_signature = 'nonassocEQleftADDESUBleftMULDIVrightNEGPOSrightPOWADD ADDE AS AXE BBQ BUILD CHICKEN COMPARE CONST DIV DOT EQ FLOAT FOX FR HATCH ID IFF IFT INT LBRACE LBRACK LOOPF LOOPT LPAREN MUL NEWLINE PECK PICK POW PUSH RBRACE RBRACK REPF REPT ROOSTER RPAREN STR SUB TOP \texpressions : expressions NEWLINE block\n                       | expressions NEWLINE stmt\n                       | block\n                       | stmt\n        enter : BUILD FUNC LBRACEenter : LOOPT LBRACEenter : LOOPF LBRACEenter : REPT LBRACEenter : REPF LBRACEenter : IFT LBRACEenter : IFF LBRACEblock : enter NEWLINE expressions NEWLINE RBRACEstmt : AXE\n                | CHICKEN\n                | ADD\n                | FOX\n                | ROOSTER\n                | COMPARE\n                | PICK\n                | PECK\n                | FR\n                | BBQ\n        stmt : HATCH FUNCstmt : PUSH STR\n                | PUSH mathexpr\n        stmt : IDSTR AS IDSTRstmt : ID LBRACK INT RBRACK EQ VAL\n                | ID EQ VAL\n        stmt : ID LBRACK INT RBRACK\n                | ID\n        stmt : CONST ID EQ VALstmt : mathexpr : mathexpr MUL mathexprmathexpr : mathexpr DIV mathexprmathexpr : mathexpr ADDE mathexprmathexpr : mathexpr SUB mathexprmathexpr : mathexpr POW mathexprmathexpr : LPAREN mathexpr RPARENmathexpr : SUB mathexpr %prec NEGmathexpr : ADDE mathexpr %prec POSmathexpr : INT\n                    | FLOAT\n        mathexpr : IDFUNC : ID DOT FUNC\n                | ID\n        VAL : STR\n               | TOP\n               | mathexpr\n        IDSTR : ID\n                 | STR\n        '
     
-_lr_action_items = {'AXE':([0,28,29,72,],[5,5,5,5,]),'CHICKEN':([0,28,29,72,],[6,6,6,6,]),'ADD':([0,28,29,72,],[7,7,7,7,]),'FOX':([0,28,29,72,],[8,8,8,8,]),'ROOSTER':([0,28,29,72,],[9,9,9,9,]),'COMPARE':([0,28,29,72,],[10,10,10,10,]),'PICK':([0,28,29,72,],[11,11,11,11,]),'PECK':([0,28,29,72,],[12,12,12,12,]),'FR':([0,28,29,72,],[13,13,13,13,]),'BBQ':([0,28,29,72,],[14,14,14,14,]),'HATCH':([0,28,29,72,],[15,15,15,15,]),'PUSH':([0,28,29,72,],[16,16,16,16,]),'ID':([0,15,16,20,21,28,29,34,35,36,40,42,54,55,56,57,58,59,70,72,83,],[19,31,39,43,44,19,19,39,39,39,64,39,31,39,39,39,39,39,39,19,39,]),'CONST':([0,28,29,72,],[20,20,20,20,]),'NEWLINE':([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,19,28,29,30,31,32,33,37,38,39,45,46,47,48,49,50,51,52,53,60,61,63,64,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,82,84,],[-32,28,-3,-4,29,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-50,-30,-32,-32,-23,-45,-24,-25,-41,-42,-43,-6,-7,-8,-9,-10,-11,-1,-2,72,-40,-39,-26,-49,-28,-46,-47,-48,-5,-32,-44,-33,-34,-35,-36,-37,-38,-29,-31,-12,-27,]),'$end':([0,1,2,3,5,6,7,8,9,10,11,12,13,14,17,19,28,30,31,32,33,37,38,39,51,52,60,61,63,64,66,67,68,69,73,74,75,76,77,78,79,80,81,82,84,],[-32,0,-3,-4,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-50,-30,-32,-23,-45,-24,-25,-41,-42,-43,-1,-2,-40,-39,-26,-49,-28,-46,-47,-48,-44,-33,-34,-35,-36,-37,-38,-29,-31,-12,-27,]),'BUILD':([0,28,29,72,],[21,21,21,21,]),'LOOPT':([0,28,29,72,],[22,22,22,22,]),'LOOPF':([0,28,29,72,],[23,23,23,23,]),'REPT':([0,28,29,72,],[24,24,24,24,]),'REPF':([0,28,29,72,],[25,25,25,25,]),'IFT':([0,28,29,72,],[26,26,26,26,]),'IFF':([0,28,29,72,],[27,27,27,27,]),'STR':([0,16,28,29,40,42,70,72,83,],[17,32,17,17,17,67,67,17,67,]),'LPAREN':([16,34,35,36,42,55,56,57,58,59,70,83,],[36,36,36,36,36,36,36,36,36,36,36,36,]),'SUB':([16,33,34,35,36,37,38,39,42,55,56,57,58,59,60,61,62,69,70,74,75,76,77,78,79,83,],[35,58,35,35,35,-41,-42,-43,35,35,35,35,35,35,-40,-39,58,58,35,-33,-34,-35,-36,-37,-38,35,]),'ADDE':([16,33,34,35,36,37,38,39,42,55,56,57,58,59,60,61,62,69,70,74,75,76,77,78,79,83,],[34,57,34,34,34,-41,-42,-43,34,34,34,34,34,34,-40,-39,57,57,34,-33,-34,-35,-36,-37,-38,34,]),'INT':([16,34,35,36,41,42,55,56,57,58,59,70,83,],[37,37,37,37,65,37,37,37,37,37,37,37,37,]),'FLOAT':([16,34,35,36,42,55,56,57,58,59,70,83,],[38,38,38,38,38,38,38,38,38,38,38,38,]),'AS':([17,18,19,],[-50,40,-49,]),'LBRACK':([19,],[41,]),'EQ':([19,43,80,],[42,70,83,]),'LBRACE':([22,23,24,25,26,27,44,],[45,46,47,48,49,50,71,]),'DOT':([31,],[54,]),'MUL':([33,37,38,39,60,61,62,69,74,75,76,77,78,79,],[55,-41,-42,-43,-40,-39,55,55,-33,-34,55,55,-37,-38,]),'DIV':([33,37,38,39,60,61,62,69,74,75,76,77,78,79,],[56,-41,-42,-43,-40,-39,56,56,-33,-34,56,56,-37,-38,]),'POW':([33,37,38,39,60,61,62,69,74,75,76,77,78,79,],[59,-41,-42,-43,59,59,59,59,59,59,59,59,59,-38,]),'RPAREN':([37,38,39,60,61,62,74,75,76,77,78,79,],[-41,-42,-43,-40,-39,79,-33,-34,-35,-36,-37,-38,]),'TOP':([42,70,83,],[68,68,68,]),'RBRACK':([65,],[80,]),'RBRACE':([72,],[82,]),}
+_lr_action_items = {'AXE':([0,28,29,72,],[5,5,5,5,]),'CHICKEN':([0,28,29,72,],[6,6,6,6,]),'ADD':([0,28,29,72,],[7,7,7,7,]),'FOX':([0,28,29,72,],[8,8,8,8,]),'ROOSTER':([0,28,29,72,],[9,9,9,9,]),'COMPARE':([0,28,29,72,],[10,10,10,10,]),'PICK':([0,28,29,72,],[11,11,11,11,]),'PECK':([0,28,29,72,],[12,12,12,12,]),'FR':([0,28,29,72,],[13,13,13,13,]),'BBQ':([0,28,29,72,],[14,14,14,14,]),'HATCH':([0,28,29,72,],[15,15,15,15,]),'PUSH':([0,28,29,72,],[16,16,16,16,]),'ID':([0,15,16,20,21,28,29,34,35,36,40,42,54,55,56,57,58,59,70,72,83,],[19,31,39,43,31,19,19,39,39,39,64,39,31,39,39,39,39,39,39,19,39,]),'CONST':([0,28,29,72,],[20,20,20,20,]),'NEWLINE':([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,19,28,29,30,31,32,33,37,38,39,45,46,47,48,49,50,51,52,53,60,61,63,64,66,67,68,69,71,72,73,74,75,76,77,78,79,80,81,82,84,],[-32,28,-3,-4,29,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-50,-30,-32,-32,-23,-45,-24,-25,-41,-42,-43,-6,-7,-8,-9,-10,-11,-1,-2,72,-40,-39,-26,-49,-28,-46,-47,-48,-5,-32,-44,-33,-34,-35,-36,-37,-38,-29,-31,-12,-27,]),'$end':([0,1,2,3,5,6,7,8,9,10,11,12,13,14,17,19,28,30,31,32,33,37,38,39,51,52,60,61,63,64,66,67,68,69,73,74,75,76,77,78,79,80,81,82,84,],[-32,0,-3,-4,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-50,-30,-32,-23,-45,-24,-25,-41,-42,-43,-1,-2,-40,-39,-26,-49,-28,-46,-47,-48,-44,-33,-34,-35,-36,-37,-38,-29,-31,-12,-27,]),'BUILD':([0,28,29,72,],[21,21,21,21,]),'LOOPT':([0,28,29,72,],[22,22,22,22,]),'LOOPF':([0,28,29,72,],[23,23,23,23,]),'REPT':([0,28,29,72,],[24,24,24,24,]),'REPF':([0,28,29,72,],[25,25,25,25,]),'IFT':([0,28,29,72,],[26,26,26,26,]),'IFF':([0,28,29,72,],[27,27,27,27,]),'STR':([0,16,28,29,40,42,70,72,83,],[17,32,17,17,17,67,67,17,67,]),'LPAREN':([16,34,35,36,42,55,56,57,58,59,70,83,],[36,36,36,36,36,36,36,36,36,36,36,36,]),'SUB':([16,33,34,35,36,37,38,39,42,55,56,57,58,59,60,61,62,69,70,74,75,76,77,78,79,83,],[35,58,35,35,35,-41,-42,-43,35,35,35,35,35,35,-40,-39,58,58,35,-33,-34,-35,-36,-37,-38,35,]),'ADDE':([16,33,34,35,36,37,38,39,42,55,56,57,58,59,60,61,62,69,70,74,75,76,77,78,79,83,],[34,57,34,34,34,-41,-42,-43,34,34,34,34,34,34,-40,-39,57,57,34,-33,-34,-35,-36,-37,-38,34,]),'INT':([16,34,35,36,41,42,55,56,57,58,59,70,83,],[37,37,37,37,65,37,37,37,37,37,37,37,37,]),'FLOAT':([16,34,35,36,42,55,56,57,58,59,70,83,],[38,38,38,38,38,38,38,38,38,38,38,38,]),'AS':([17,18,19,],[-50,40,-49,]),'LBRACK':([19,],[41,]),'EQ':([19,43,80,],[42,70,83,]),'LBRACE':([22,23,24,25,26,27,31,44,73,],[45,46,47,48,49,50,-45,71,-44,]),'DOT':([31,],[54,]),'MUL':([33,37,38,39,60,61,62,69,74,75,76,77,78,79,],[55,-41,-42,-43,-40,-39,55,55,-33,-34,55,55,-37,-38,]),'DIV':([33,37,38,39,60,61,62,69,74,75,76,77,78,79,],[56,-41,-42,-43,-40,-39,56,56,-33,-34,56,56,-37,-38,]),'POW':([33,37,38,39,60,61,62,69,74,75,76,77,78,79,],[59,-41,-42,-43,59,59,59,59,59,59,59,59,59,-38,]),'RPAREN':([37,38,39,60,61,62,74,75,76,77,78,79,],[-41,-42,-43,-40,-39,79,-33,-34,-35,-36,-37,-38,]),'TOP':([42,70,83,],[68,68,68,]),'RBRACK':([65,],[80,]),'RBRACE':([72,],[82,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'expressions':([0,29,],[1,53,]),'block':([0,28,29,72,],[2,51,2,51,]),'stmt':([0,28,29,72,],[3,52,3,52,]),'enter':([0,28,29,72,],[4,4,4,4,]),'IDSTR':([0,28,29,40,72,],[18,18,18,63,18,]),'FUNC':([15,54,],[30,73,]),'mathexpr':([16,34,35,36,42,55,56,57,58,59,70,83,],[33,60,61,62,69,74,75,76,77,78,69,69,]),'VAL':([42,70,83,],[66,81,84,]),}
+_lr_goto_items = {'expressions':([0,29,],[1,53,]),'block':([0,28,29,72,],[2,51,2,51,]),'stmt':([0,28,29,72,],[3,52,3,52,]),'enter':([0,28,29,72,],[4,4,4,4,]),'IDSTR':([0,28,29,40,72,],[18,18,18,63,18,]),'FUNC':([15,21,54,],[30,44,73,]),'mathexpr':([16,34,35,36,42,55,56,57,58,59,70,83,],[33,60,61,62,69,74,75,76,77,78,69,69,]),'VAL':([42,70,83,],[66,81,84,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,54 +27,54 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> expressions","S'",1,None,None,None),
-  ('expressions -> expressions NEWLINE block','expressions',3,'p_program','main.py',259),
-  ('expressions -> expressions NEWLINE stmt','expressions',3,'p_program','main.py',260),
-  ('expressions -> block','expressions',1,'p_program','main.py',261),
-  ('expressions -> stmt','expressions',1,'p_program','main.py',262),
-  ('enter -> BUILD ID LBRACE','enter',3,'p_enter_block_build','main.py',270),
-  ('enter -> LOOPT LBRACE','enter',2,'p_enter_block_loopt','main.py',274),
-  ('enter -> LOOPF LBRACE','enter',2,'p_enter_block_loopf','main.py',278),
-  ('enter -> REPT LBRACE','enter',2,'p_enter_block_rept','main.py',282),
-  ('enter -> REPF LBRACE','enter',2,'p_enter_block_repf','main.py',286),
-  ('enter -> IFT LBRACE','enter',2,'p_enter_block_ift','main.py',290),
-  ('enter -> IFF LBRACE','enter',2,'p_enter_block_iff','main.py',294),
-  ('block -> enter NEWLINE expressions NEWLINE RBRACE','block',5,'p_block','main.py',298),
-  ('stmt -> AXE','stmt',1,'p_stmt_keyword','main.py',302),
-  ('stmt -> CHICKEN','stmt',1,'p_stmt_keyword','main.py',303),
-  ('stmt -> ADD','stmt',1,'p_stmt_keyword','main.py',304),
-  ('stmt -> FOX','stmt',1,'p_stmt_keyword','main.py',305),
-  ('stmt -> ROOSTER','stmt',1,'p_stmt_keyword','main.py',306),
-  ('stmt -> COMPARE','stmt',1,'p_stmt_keyword','main.py',307),
-  ('stmt -> PICK','stmt',1,'p_stmt_keyword','main.py',308),
-  ('stmt -> PECK','stmt',1,'p_stmt_keyword','main.py',309),
-  ('stmt -> FR','stmt',1,'p_stmt_keyword','main.py',310),
-  ('stmt -> BBQ','stmt',1,'p_stmt_keyword','main.py',311),
-  ('stmt -> HATCH FUNC','stmt',2,'p_stmt_HATCH','main.py',316),
-  ('stmt -> PUSH STR','stmt',2,'p_stmt_PUSH','main.py',320),
-  ('stmt -> PUSH mathexpr','stmt',2,'p_stmt_PUSH','main.py',321),
-  ('stmt -> IDSTR AS IDSTR','stmt',3,'p_stmt_AS','main.py',326),
-  ('stmt -> ID LBRACK INT RBRACK EQ VAL','stmt',6,'p_stmt_SETVAR','main.py',330),
-  ('stmt -> ID EQ VAL','stmt',3,'p_stmt_SETVAR','main.py',331),
-  ('stmt -> ID LBRACK INT RBRACK','stmt',4,'p_stmt_GETVAR','main.py',339),
-  ('stmt -> ID','stmt',1,'p_stmt_GETVAR','main.py',340),
-  ('stmt -> CONST ID EQ VAL','stmt',4,'p_stmt_SETCONST','main.py',348),
-  ('stmt -> <empty>','stmt',0,'p_stmt_BLANK','main.py',352),
-  ('mathexpr -> mathexpr MUL mathexpr','mathexpr',3,'p_expr_MUL','main.py',355),
-  ('mathexpr -> mathexpr DIV mathexpr','mathexpr',3,'p_expr_DIV','main.py',359),
-  ('mathexpr -> mathexpr ADDE mathexpr','mathexpr',3,'p_expr_ADDE','main.py',366),
-  ('mathexpr -> mathexpr SUB mathexpr','mathexpr',3,'p_expr_SUB','main.py',370),
-  ('mathexpr -> mathexpr POW mathexpr','mathexpr',3,'p_expr_POW','main.py',374),
-  ('mathexpr -> LPAREN mathexpr RPAREN','mathexpr',3,'p_expr_PARENMATH','main.py',378),
-  ('mathexpr -> SUB mathexpr','mathexpr',2,'p_expr_NEG','main.py',382),
-  ('mathexpr -> ADDE mathexpr','mathexpr',2,'p_expr_POS','main.py',386),
-  ('mathexpr -> INT','mathexpr',1,'p_expr_MATH','main.py',390),
-  ('mathexpr -> FLOAT','mathexpr',1,'p_expr_MATH','main.py',391),
-  ('mathexpr -> ID','mathexpr',1,'p_expr_MATHVAR','main.py',396),
-  ('FUNC -> ID DOT FUNC','FUNC',3,'p_FUNCTION','main.py',401),
-  ('FUNC -> ID','FUNC',1,'p_FUNCTION','main.py',402),
-  ('VAL -> STR','VAL',1,'p_VAL','main.py',407),
-  ('VAL -> TOP','VAL',1,'p_VAL','main.py',408),
-  ('VAL -> mathexpr','VAL',1,'p_VAL','main.py',409),
-  ('IDSTR -> ID','IDSTR',1,'p_IDSTR','main.py',414),
-  ('IDSTR -> STR','IDSTR',1,'p_IDSTR','main.py',415),
+  ('expressions -> expressions NEWLINE block','expressions',3,'p_program','main.py',260),
+  ('expressions -> expressions NEWLINE stmt','expressions',3,'p_program','main.py',261),
+  ('expressions -> block','expressions',1,'p_program','main.py',262),
+  ('expressions -> stmt','expressions',1,'p_program','main.py',263),
+  ('enter -> BUILD FUNC LBRACE','enter',3,'p_enter_block_build','main.py',271),
+  ('enter -> LOOPT LBRACE','enter',2,'p_enter_block_loopt','main.py',275),
+  ('enter -> LOOPF LBRACE','enter',2,'p_enter_block_loopf','main.py',279),
+  ('enter -> REPT LBRACE','enter',2,'p_enter_block_rept','main.py',283),
+  ('enter -> REPF LBRACE','enter',2,'p_enter_block_repf','main.py',287),
+  ('enter -> IFT LBRACE','enter',2,'p_enter_block_ift','main.py',291),
+  ('enter -> IFF LBRACE','enter',2,'p_enter_block_iff','main.py',295),
+  ('block -> enter NEWLINE expressions NEWLINE RBRACE','block',5,'p_block','main.py',299),
+  ('stmt -> AXE','stmt',1,'p_stmt_keyword','main.py',303),
+  ('stmt -> CHICKEN','stmt',1,'p_stmt_keyword','main.py',304),
+  ('stmt -> ADD','stmt',1,'p_stmt_keyword','main.py',305),
+  ('stmt -> FOX','stmt',1,'p_stmt_keyword','main.py',306),
+  ('stmt -> ROOSTER','stmt',1,'p_stmt_keyword','main.py',307),
+  ('stmt -> COMPARE','stmt',1,'p_stmt_keyword','main.py',308),
+  ('stmt -> PICK','stmt',1,'p_stmt_keyword','main.py',309),
+  ('stmt -> PECK','stmt',1,'p_stmt_keyword','main.py',310),
+  ('stmt -> FR','stmt',1,'p_stmt_keyword','main.py',311),
+  ('stmt -> BBQ','stmt',1,'p_stmt_keyword','main.py',312),
+  ('stmt -> HATCH FUNC','stmt',2,'p_stmt_HATCH','main.py',317),
+  ('stmt -> PUSH STR','stmt',2,'p_stmt_PUSH','main.py',321),
+  ('stmt -> PUSH mathexpr','stmt',2,'p_stmt_PUSH','main.py',322),
+  ('stmt -> IDSTR AS IDSTR','stmt',3,'p_stmt_AS','main.py',327),
+  ('stmt -> ID LBRACK INT RBRACK EQ VAL','stmt',6,'p_stmt_SETVAR','main.py',331),
+  ('stmt -> ID EQ VAL','stmt',3,'p_stmt_SETVAR','main.py',332),
+  ('stmt -> ID LBRACK INT RBRACK','stmt',4,'p_stmt_GETVAR','main.py',340),
+  ('stmt -> ID','stmt',1,'p_stmt_GETVAR','main.py',341),
+  ('stmt -> CONST ID EQ VAL','stmt',4,'p_stmt_SETCONST','main.py',349),
+  ('stmt -> <empty>','stmt',0,'p_stmt_BLANKLINE','main.py',353),
+  ('mathexpr -> mathexpr MUL mathexpr','mathexpr',3,'p_expr_MUL','main.py',356),
+  ('mathexpr -> mathexpr DIV mathexpr','mathexpr',3,'p_expr_DIV','main.py',364),
+  ('mathexpr -> mathexpr ADDE mathexpr','mathexpr',3,'p_expr_ADDE','main.py',371),
+  ('mathexpr -> mathexpr SUB mathexpr','mathexpr',3,'p_expr_SUB','main.py',375),
+  ('mathexpr -> mathexpr POW mathexpr','mathexpr',3,'p_expr_POW','main.py',379),
+  ('mathexpr -> LPAREN mathexpr RPAREN','mathexpr',3,'p_expr_PARENMATH','main.py',383),
+  ('mathexpr -> SUB mathexpr','mathexpr',2,'p_expr_NEG','main.py',387),
+  ('mathexpr -> ADDE mathexpr','mathexpr',2,'p_expr_POS','main.py',391),
+  ('mathexpr -> INT','mathexpr',1,'p_expr_MATH','main.py',395),
+  ('mathexpr -> FLOAT','mathexpr',1,'p_expr_MATH','main.py',396),
+  ('mathexpr -> ID','mathexpr',1,'p_expr_MATHVAR','main.py',401),
+  ('FUNC -> ID DOT FUNC','FUNC',3,'p_FUNCTION','main.py',406),
+  ('FUNC -> ID','FUNC',1,'p_FUNCTION','main.py',407),
+  ('VAL -> STR','VAL',1,'p_VAL','main.py',412),
+  ('VAL -> TOP','VAL',1,'p_VAL','main.py',413),
+  ('VAL -> mathexpr','VAL',1,'p_VAL','main.py',414),
+  ('IDSTR -> ID','IDSTR',1,'p_IDSTR','main.py',419),
+  ('IDSTR -> STR','IDSTR',1,'p_IDSTR','main.py',420),
 ]
