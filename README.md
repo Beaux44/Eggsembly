@@ -53,16 +53,16 @@ Eggsembly is capable of doing anything theoretically possible to do in Chicken.
 - ~~Functions~~
 - ~~Imports~~
 - ~~Eggshell~~
-- ~~Rewrite HelloWorld~~
+- ~~Rewrite HelloWorld x4~~
 - Package Manager
 - ~~String Literals~~
-- Float Literals
-- Division
+- Float Literals *(being added with the new parser)*
+- Division *(being added with new parser, kind of)*
 - ~~Variables~~
 - ~~Variable Suggestions~~
 - ~~Macros~~
-- If Statements
-- While Statements
+- If Statements *(being added with the new parser)*
+- While Statements *(being added with the new parser)*
 - ~~Online Interpreter~~
 - Bytecode compilation
 - Whatever else I want?

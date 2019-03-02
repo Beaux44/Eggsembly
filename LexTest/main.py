@@ -1,5 +1,6 @@
 import ply.lex as lex, ply.yacc as yacc
 from pprint import pprint
+from typing import Union, List, Dict
 
 """
     TODO:
@@ -36,18 +37,21 @@ except ImportError:
 
 class Command(object):
     def __init__(self, type, ident=None, index=None, value=None):
-        self.type = type
-        self.ident = ident
-        self.index = index
-        self.value = value
+        self.type: str = type
+        self.ident: str = ident
+        self.index: int = index
+        self.value: Union[str, float, int] = value
 
     def __repr__(self):
         return "Command(%r, %r, %r, %r)" % (self.type, self.ident, self.index, self.value)
 
+    def __iter__(self):
+        yield self
+
 
 
 class Block(object):
-    def __init__(self, type, code):
+    def __init__(self, type: Command, code: list):
         self.type: Command = type
         self.code: list = code
 
@@ -55,42 +59,40 @@ class Block(object):
         return "Block(%r, code)" % (self.type,)
 
     def __iter__(self):
-        return self.code.__iter__()
+        yield self
 
 
 class Const(object):
-    def __init__(self, ID, VAL):
-        self.ID = ID
-        self.VAL = VAL
+    def __init__(self, ID: str, VAL: Union[int, str, float]):
+        self.ID: str = ID
+        self.VAL: Union[int, str, float] = VAL
 
 
 class EggLex(object):
     def __init__(self, **kwargs):
-        self.lexer = lex.lex(module=self, **kwargs)
-        self.lineno = self.lexer.lineno
+        self.lexer: lex.Lexer = lex.lex(module=self, **kwargs)
+        self.lineno: int = self.lexer.lineno
 
-    def __call__(self, data):
-        self.data = data
+    def __call__(self, data: str):
+        self.data: str = data
         self.lexer.input(data)
         line = 0
-        toks = [[]]
-        while True:
-            tok = self.lexer.token()
-            if not tok:
-                break
+        toks: List[List[lex.LexToken]] = [[]]
+        tok: lex.LexToken = self.lexer.token()
+        while tok:
             if tok.type == "NEWLINE":
-                # toks[line] += [tok]
                 line += 1
                 toks += [[]]
             else:
                 toks[line] += [tok]
+            tok = self.lexer.token()
         return [*map(tuple, toks)]
 
-    def findColumn(self, token):
-        line_start = self.data.rfind('\n', 0, token.lexpos)
-        return (token.lexpos - line_start) - 1
+    def findColumn(self, t: lex.LexToken) -> int:
+        line_start = self.data.rfind('\n', 0, t.lexpos)
+        return (t.lexpos - line_start) - 1
 
-    def t_error(self, t):
+    def t_error(self, t: lex.LexToken) -> None:
         cprint(ERROR,
                ("Invalid symbol in file %r on line %d, column %d:\n"
                 "\t%s\n\t") % (nonExistentFileName,
@@ -118,8 +120,8 @@ class EggLex(object):
         'Top': 'TOP',
         'loop_true': 'LOOPT',
         'loop_false': 'LOOPF',
-        'repeat_true': 'REPT',
-        'repeat_false': 'REPF',
+        'repeat_while': 'REPW',
+        'repeat_until': 'REPU',
         'if_true': 'IFT',
         'if_false': 'IFF',
         'const': 'CONST',
@@ -146,7 +148,7 @@ class EggLex(object):
               'NEWLINE',
               ] + [*reserved.values()]
 
-    def t_ignore_COMMENT(self, t):
+    def t_ignore_COMMENT(self, t: lex.LexToken) -> None:
         r'(//[^\n]*|/\*(?:.|\n)*?(?:\*/|\Z)|~~\[==(?:.|\n)*?(?:==\]~~/|\Z))'
 
     t_ignore = ' \t'
@@ -168,24 +170,24 @@ class EggLex(object):
     t_RBRACK = r']'
 
 
-    def t_NEWLINE(self, t):
+    def t_NEWLINE(self, t: lex.LexToken) -> lex.LexToken:
         r'(?:\r?\n)+'
         t.lexer.lineno += t.value.count("\n")
         self.lineno = t.lexer.lineno
         t.value = t.value.count("\n")
         return t
 
-    def t_FLOAT(self, t):
+    def t_FLOAT(self, t: lex.LexToken) -> lex.LexToken:
         r'(?:\d+\.\d*|\d*\.\d+)'
         t.value = float(t.value)
         return t
 
-    def t_INT(self, t):
+    def t_INT(self, t: lex.LexToken) -> lex.LexToken:
         r'\b\d+'
         t.value = int(t.value)
         return t
 
-    def t_ID(self, t):
+    def t_ID(self, t: lex.LexToken) -> lex.LexToken:
         r'\b([A-Za-z_]\w*)\b'
         t.type = self.reserved.get(t.value, 'ID')
         return t
@@ -206,21 +208,22 @@ def flatten(a: list) -> list:
 
 class EggParse(object):
     def __init__(self, **kwargs):
-        self.vars = {}
-        self.funcs = {}
-        self.consts = {}
+        self.vars: Dict[str, Union[int, float, str]] = {}
+        self.funcs: Dict[str, Block] = {}
+        self.consts: Dict[str, Union[int, float, str]] = {}
+
         self.lexer = EggLex()
-        self.parser = yacc.yacc(module=self, debug=False, write_tables=False, **kwargs)
+        self.parser: yacc.LRParser = yacc.yacc(module=self, debug=False, write_tables=False, **kwargs)
         self.parser.lineno = 1
 
-    def __call__(self, data, **kwargs):
+    def __call__(self, data: str, **kwargs) -> List[Union[Command, Block]]:
         self.data = self.lexer.data = data
-        return self.parser.parse(self.data, lexer=self.lexer.lexer, **kwargs)
+        return list(self.parser.parse(self.data, lexer=self.lexer.lexer, **kwargs))
 
     tokens = EggLex.tokens
 
     precedence = (
-        ('nonassoc', 'EQ'),
+        ('right', 'EQ'),
         ('left', 'ADDE', 'SUB'),
         ('left', 'MUL', 'DIV', 'FDIV'),
         ('left', 'LPAREN'),
@@ -259,11 +262,11 @@ class EggParse(object):
         p[0] = ("LOOP", "FALSE")
 
     def p_enter_block_rept(self, p):
-        "enter : REPT LBRACE"
+        "enter : REPW LBRACE"
         p[0] = ("REPEAT", "TRUE")
 
     def p_enter_block_repf(self, p):
-        "enter : REPF LBRACE"
+        "enter : REPU LBRACE"
         p[0] = ("REPEAT", "FALSE")
 
     def p_enter_block_ift(self, p):
@@ -337,7 +340,7 @@ class EggParse(object):
         self.consts[p[2]] = p[4]
 
     def p_stmt_BLANKLINE(self, p):
-        "stmt : "
+        """stmt : """
 
     def p_expr_MUL(self, p):
         """mathexpr : mathexpr MUL mathexpr"""
@@ -457,10 +460,10 @@ lexed = lexer(
     "loop_false {\n"
     "   push 1\n"
     "}\n"
-    "repeat_true {\n"
+    "repeat_while {\n"
     "   push 0\n"
     "}\n"
-    "repeat_false {\n"
+    "repeat_until {\n"
     "   push -1\n"
     "}\n"
 )
@@ -499,11 +502,11 @@ parsed = parser(
     "   rooster\n"
     "   a = Top\n"
     "} // blah\n"
-    "if_false {\n"
-    "   push bar\n"
-    "}\n"
     "if_true {\n"
     "   push foo\n"
+    "}\n"
+    "if_false {\n"
+    "   push bar\n"
     "}\n"
     "loop_true {\n"
     "   push 2\n"
@@ -511,10 +514,10 @@ parsed = parser(
     "loop_false {\n"
     "   push 1\n"
     "}\n"
-    "repeat_true {\n"
+    "repeat_while {\n"
     "   push 0\n"
     "}\n"
-    "repeat_false {\n"
+    "repeat_until {\n"
     "   push -1\n"
     "}\n"
     "~~[====> I wave my sword at thee!\n", debug=0
@@ -545,8 +548,8 @@ parsed = parser(
 #          Command('BBQ', None, None, None),
 #          Command('SET', 'baz', None, 3.0),
 #          Block(('BUILD', 'qux'), code),
-#          Block(('IF', 'FALSE'), code),
 #          Block(('IF', 'TRUE'), code),
+#          Block(('IF', 'FALSE'), code),
 #          Block(('LOOP', 'TRUE'), code),
 #          Block(('LOOP', 'FALSE'), code),
 #          Block(('REPEAT', 'TRUE'), code),

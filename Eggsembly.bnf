@@ -1,12 +1,11 @@
 // BNF description of Eggsembly syntax
 // Still up for change, though
-// Not currently correct as per the new parser
 
 <syntax>     ::=  <optionalWs> <line> | <syntax> <endline> <syntax>
 <line>       ::=  <keyword>
                 | <push>
                 | <hatch>
-                | <anychrs> <ws> "as" <ws> <anychrs>
+                | <str> <optionalWs> "as" <optionalWs> <str>
                 | "build" <ws> <id> <optionalWs> "{" <endline> <syntax> "}"
                 | "repeat_" <woru>  <optionalWs> "{" <endline> <syntax> "}"
                 | "loop_"   <torf>  <optionalWs> "{" <endline> <syntax> "}"
@@ -38,22 +37,36 @@
 <alunder>    ::= <letter> | "_"
 <alnumunder> ::= <alnum>  | "_"
 <any>        ::= <letter> | <digit> | <symbol>
-<anychrs>    ::= <any>    | <anychrs> <any>
+//<anychrs>    ::= <any>    | <anychrs> <any>
 <strchrs1>   ::= <any>    | "'"     | '\"'
 <strchrs2>   ::= <any>    | '"'     | "\'"
 <string1>    ::= <any>    | <strchrs1> <any>
 <string2>    ::= <any>    | <strchrs2> <any>
 
+
 <num>        ::= <num> <digit> | <digit>
+<float>      ::= <num> "." | "." <num> | <num> "." <num>
 <keyword>    ::= "axe" | "chicken" | "add" | "fox" | "rooster" | "compare" | "pick" | "peck" | "fr" | "bbq"
 <str>        ::= '"' <string1> '"' | "'" <string2> "'"
-<val>        ::= <str> | <num>
+<val>        ::= <str> | <mathexpr>
 <push>       ::= "push"  <ws> <val>
 <hatch>      ::= "hatch" <ws> <func>
+
+<mathexpr>  ::= <mathexpr> <optionalWs> "+"  <optionalWs> <mathexpr>
+              | <mathexpr> <optionalWs> "-"  <optionalWs> <mathexpr>
+              | <mathexpr> <optionalWs> "*"  <optionalWs> <mathexpr>
+              | <mathexpr> <optionalWs> "/"  <optionalWs> <mathexpr>
+              | <mathexpr> <optionalWs> "\\" <optionalWs> <mathexpr>
+              | "(" <optionalWs> <mathexpr> <optionalWs> ")"
+              | <mathexpr> <optionalWs> "(" <optionalWs> <mathexpr> <optionalWs> ")"
+              | <float>
+              | <num>
+              | <id>
 
 <var>        ::= <id> <optionalWs> "[" <optionalWs> <num> <optionalWs> "]" <optionalWs> "=" <optionalWs> <val>
                | <id> <optionalWs> "[" <optionalWs> <num> <optionalWs> "]" <optionalWs> "=" <optionalWs> "Top"
                | <id> <optionalWs> "[" <optionalWs> <num> <optionalWs> "]"
                | <id> <optionalWs> "=" <optionalWs> <val>
                | <id> <optionalWs> "=" <optionalWs> "Top"
+               | "const" <ws> <id>  <optionalWs> "=" <optionalWs> <val>
                | <id>
