@@ -6,5 +6,5 @@ that would have been virtually impossible to do previously.
 ## Todo
 - Take OOP too far
 - Make it do anything
-- Come up with better while notation
+- ~~Come up with better while notation~~
 - ~~Make blocks work~~

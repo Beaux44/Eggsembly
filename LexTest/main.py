@@ -5,8 +5,8 @@ from pprint import pprint
     TODO:
         Take OOP too far
         Make it do anything
-        Come up with better while notation
-        Make blocks work
+        ✓ Come up with better while notation
+        ✓ Make blocks work
 """
 
 nonExistentFileName = ""
@@ -44,21 +44,6 @@ class Command(object):
     def __repr__(self):
         return "Command(%r, %r, %r, %r)" % (self.type, self.ident, self.index, self.value)
 
-    def __str__(self):
-        if self.type in ["GET", "SET"]:
-            return (self.ident
-                    + ("[%s]" % str(self.index)) * (self.index is not None)
-                    + (" = " + str(self.value)) * (self.value is not None))
-        if self.type == "PUSH":
-            return "%s %s" % (self.type.lower(), self.value)
-        if self.type == "HATCH":
-            return "%s %s" % (self.type.lower(), self.ident)
-        if self.type in ["IF", "WHILE", "LOOP"]:
-            return "%s_%s" % (self.type.lower(), self.ident.lower())
-        return self.type.lower()
-
-    def __iter__(self):
-        yield self
 
 
 class Block(object):
@@ -69,15 +54,7 @@ class Block(object):
     def __repr__(self):
         return "Block(%r, code)" % (self.type,)
 
-    def __str__(self):
-        if self.type.type == "BUILD":
-            return "build " + self.type.ident + " {\n" + '\n'.join(["\t" + str(i) for i in self.code]) + "\n}"
-        else:
-            return ("%s_%s {\n" % (self.type.type.lower(), self.type.ident.lower())
-                    + '\n'.join(["\t" + str(i) for i in self.code]) + "\n}")
-
     def __iter__(self):
-        print(self.code)
         return self.code.__iter__()
 
 
@@ -102,7 +79,7 @@ class EggLex(object):
             if not tok:
                 break
             if tok.type == "NEWLINE":
-                toks[line] += [tok]
+                # toks[line] += [tok]
                 line += 1
                 toks += [[]]
             else:
@@ -156,6 +133,7 @@ class EggLex(object):
               'ADDE',
               'SUB',
               'DIV',
+              'FDIV',
               'MUL',
               'POW',
               'FLOAT',
@@ -173,13 +151,14 @@ class EggLex(object):
 
     t_ignore = ' \t'
 
-    literals = "()[]{}.=/+-*^"
+    literals = "()[]{}.=\\/+-*^"
     t_EQ = r'='
     t_DOT = r'\.'
-    t_ADD = r'\+'
+    t_ADDE = r'\+'
     t_SUB = r'-'
     t_MUL = r'\*'
     t_DIV = r'/'
+    t_FDIV = r'\\'
     t_POW = r'\^'
     t_LPAREN = r'\('
     t_LBRACE = r'{'
@@ -231,7 +210,7 @@ class EggParse(object):
         self.funcs = {}
         self.consts = {}
         self.lexer = EggLex()
-        self.parser = yacc.yacc(module=self, **kwargs)
+        self.parser = yacc.yacc(module=self, debug=False, write_tables=False, **kwargs)
         self.parser.lineno = 1
 
     def __call__(self, data, **kwargs):
@@ -243,8 +222,8 @@ class EggParse(object):
     precedence = (
         ('nonassoc', 'EQ'),
         ('left', 'ADDE', 'SUB'),
-        ('left', 'MUL', 'DIV'),
-        # ('right', 'IMPMUL'),
+        ('left', 'MUL', 'DIV', 'FDIV'),
+        ('left', 'LPAREN'),
         ('right', 'NEG', 'POS'),
         ('right', 'POW')
     )
@@ -313,6 +292,14 @@ class EggParse(object):
         """
         p[0] = Command(p[1].upper())
 
+    def p_stmt_pick(self, p):
+        """stmt : PICK INT"""
+        p[0] = [Command("PUSH", None, None, p[2]), Command("PICK")]
+
+    def p_stmt_peck(self, p):
+        """stmt : PECK INT"""
+        p[0] = [Command("PUSH", None, None, p[2]), Command("PECK")]
+
     def p_stmt_HATCH(self, p):
         "stmt : HATCH FUNC"
         p[0] = Command("HATCH", p[2])
@@ -356,16 +343,17 @@ class EggParse(object):
         """mathexpr : mathexpr MUL mathexpr"""
         p[0] = p[1] * p[3]
 
-    # def p_expr_IMPMUL(self, p):
-    #     """mathexpr : mathexpr LPAREN mathexpr RPAREN %prec IMPMUL"""
-    #     p[0] = p[1] * p[3]
+    def p_expr_IMPMUL(self, p):
+        """mathexpr : mathexpr LPAREN mathexpr RPAREN"""
+        p[0] = p[1] * p[3]
 
     def p_expr_DIV(self, p):
         """mathexpr : mathexpr DIV mathexpr"""
-        if isinstance(p[1], float) or isinstance(p[3], float):
-            p[0] = p[1] / p[3]
-        else:
-            p[0] = p[1] // p[3]
+        p[0] = p[1] / p[3]
+
+    def p_expr_FDIV(self, p):
+        """mathexpr : mathexpr FDIV mathexpr"""
+        p[0] = p[1] // p[3]
     
     def p_expr_ADDE(self, p):
         """mathexpr : mathexpr ADDE mathexpr"""
@@ -427,16 +415,20 @@ parser = EggParse()
 
 from time import time_ns
 start = time_ns()
-print(*map(lambda a: f"Line {a[0]}: {a[1]}", enumerate(lexer(
+lexed = lexer(
     "const foo = 2^4 / 4\n"
     "const bar = 3\n"
     "push -foo^bar\n"
     "push foo\n"
+    "push 2 - 2(3 + 1)\n"
     "push ((2-1)^bar)^foo\n"
     "push foo*bar*foo^2\n"
     "push bar*foo*bar*foo\n"
+    "push (bar(foo(bar(foo))))\n"
+    "push '3'\n"
     "a as b\n"
     "x as y\n"
+    "axe\nchicken\nadd\nfox\nrooster\ncompare\npick\npick 5\npeck\npick 3\nfr\nbbq\n"
     "baz = foo*bar/2.0^2\n"
     "build qux {\n"
     "   hatch ab.a\n"
@@ -471,22 +463,26 @@ print(*map(lambda a: f"Line {a[0]}: {a[1]}", enumerate(lexer(
     "repeat_false {\n"
     "   push -1\n"
     "}\n"
-    "\n"
-), 1)), sep="\n")
+)
 end = time_ns()
+print(*map(lambda a: f"Line {a[0]}: {a[1]}", enumerate(lexed, 1)), sep="\n")
 print("\nTook", (end - start) / 10**6, "milliseconds\n\n")
 
 start = time_ns()
-pprint(parser(
+parsed = parser(
     "const foo = 2^4 / 4\n"
     "const bar = 3\n"
     "push -foo^bar\n"
     "push foo\n"
+    "push 2 - 2(3 + 1)\n"
     "push ((2-1)^bar)^foo\n"
     "push foo*bar*foo^2\n"
     "push bar*foo*bar*foo\n"
+    "push (bar(foo(bar(foo))))\n"
+    "push '3'\n"
     "a as b\n"
     "x as y\n"
+    "axe\nchicken\nadd\nfox\nrooster\ncompare\npick\npick 5\npeck\npick 3\nfr\nbbq\n"
     "baz = foo*bar/2.0^2\n"
     "build qux {\n"
     "   hatch ab.a\n"
@@ -521,23 +517,42 @@ pprint(parser(
     "repeat_false {\n"
     "   push -1\n"
     "}\n"
-    "\n", debug=0
-))  # -->
-#        [Command('PUSH', None, None, -64),
-#         Command('PUSH', None, None, 4),
-#         Command('PUSH', None, None, 1),
-#         Command('PUSH', None, None, 192),
-#         Command('PUSH', None, None, 144),
-#         Command('AS', ('a', 'b'), None, None),
-#         Command('AS', ('x', 'y'), None, None),
-#         Command('SET', 'baz', None, 3.0),
-#         Block(('BUILD', 'qux'), code),
-#         Block(('IF', 'FALSE'), code),
-#         Block(('IF', 'TRUE'), code),
-#         Block(('LOOP', 'TRUE'), code),
-#         Block(('LOOP', 'FALSE'), code),
-#         Block(('REPEAT', 'TRUE'), code),
-#         Block(('REPEAT', 'FALSE'), code)]
+    "~~[====> I wave my sword at thee!\n", debug=0
+)  # -->
+#         [Command('PUSH', None, None, -64.0),
+#          Command('PUSH', None, None, 4.0),
+#          Command('PUSH', None, None, -6),
+#          Command('PUSH', None, None, 1.0),
+#          Command('PUSH', None, None, 192.0),
+#          Command('PUSH', None, None, 144.0),
+#          Command('PUSH', None, None, 144.0),
+#          Command('PUSH', None, None, "'3'"),
+#          Command('AS', ('a', 'b'), None, None),
+#          Command('AS', ('x', 'y'), None, None),
+#          Command('AXE', None, None, None),
+#          Command('CHICKEN', None, None, None),
+#          Command('ADD', None, None, None),
+#          Command('FOX', None, None, None),
+#          Command('ROOSTER', None, None, None),
+#          Command('COMPARE', None, None, None),
+#          Command('PICK', None, None, None),
+#          Command('PUSH', None, None, 5),
+#          Command('PICK', None, None, None),
+#          Command('PECK', None, None, None),
+#          Command('PUSH', None, None, 3),
+#          Command('PICK', None, None, None),
+#          Command('FR', None, None, None),
+#          Command('BBQ', None, None, None),
+#          Command('SET', 'baz', None, 3.0),
+#          Block(('BUILD', 'qux'), code),
+#          Block(('IF', 'FALSE'), code),
+#          Block(('IF', 'TRUE'), code),
+#          Block(('LOOP', 'TRUE'), code),
+#          Block(('LOOP', 'FALSE'), code),
+#          Block(('REPEAT', 'TRUE'), code),
+#          Block(('REPEAT', 'FALSE'), code)]
 
 end = time_ns()
+pprint(parsed)
 print("\nTook", (end - start) / 10**6, "milliseconds")
+
