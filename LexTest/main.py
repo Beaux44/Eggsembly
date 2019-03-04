@@ -2,113 +2,112 @@ import ply.lex as lex, ply.yacc as yacc, re
 from pprint import pprint
 from typing import Union, List, Dict, Tuple
 
-escapedChars = re.compile(r"\\(.)")
 
 symbolCodes = {
-    '\t': 'push9\nbbq',
-    '\n': 'push 10\nbbq\n',
-    '\r': 'push 4\npush 4\nrooster\npush 1\nadd\nbbq\n',
-    ' ': 'push 8\npush 4\nrooster\nbbq\n',
-    '!': 'push 8\npush 4\nrooster\npush 1\nadd\nbbq\n',
-    '"': 'push 8\npush 4\nrooster\npush 2\nadd\nbbq\n',
-    '#': 'push 8\npush 4\nrooster\npush 3\nadd\nbbq\n',
-    '$': 'push 9\npush 4\nrooster\nbbq\n',
-    '%': 'push 9\npush 4\nrooster\npush 1\nadd\nbbq\n',
-    '&': 'push 9\npush 4\nrooster\npush 2\nadd\nbbq\n',
-    "'": 'push 9\npush 4\nrooster\npush 3\nadd\nbbq\n',
-    '(': 'push 8\npush 5\nrooster\nbbq\n',
-    ')': 'push 8\npush 5\nrooster\npush 1\nadd\nbbq\n',
-    '*': 'push 8\npush 5\nrooster\npush 2\nadd\nbbq\n',
-    '+': 'push 8\npush 5\nrooster\npush 3\nadd\nbbq\n',
-    ',': 'push 9\npush 5\nrooster\npush 1\nfox\nbbq\n',
-    '-': 'push 9\npush 5\nrooster\nbbq\n',
-    '.': 'push 9\npush 5\nrooster\npush 1\nadd\nbbq\n',
-    '/': 'push 9\npush 5\nrooster\npush 2\nadd\nbbq\n',
-    '0': 'push 7\npush 7\nrooster\npush 1\nfox\nbbq\n',
-    '1': 'push 7\npush 7\nrooster\nbbq\n',
-    '2': 'push 10\npush 5\nrooster\nbbq\n',
-    '3': 'push 10\npush 5\nrooster\npush 1\nadd\nbbq\n',
-    '4': 'push 10\npush 5\nrooster\npush 2\nadd\nbbq\n',
-    '5': 'push 7\npush 7\nrooster\npush 4\nadd\nbbq\n',
-    '6': 'push 10\npush 5\nrooster\npush 4\nadd\nbbq\n',
-    '7': 'push 11\npush 5\nrooster\nbbq\n',
-    '8': 'push 11\npush 5\nrooster\npush 1\nadd\nbbq\n',
-    '9': 'push 11\npush 5\nrooster\npush 2\nadd\nbbq\n',
-    ':': 'push 10\npush 6\nrooster\npush 2\nfox\nbbq\n',
-    ';': 'push 10\npush 6\nrooster\npush 1\nfox\nbbq\n',
-    '<': 'push 10\npush 6\nrooster\nbbq\n',
-    '=': 'push 10\npush 6\nrooster\npush 1\nadd\nbbq\n',
-    '>': 'push 10\npush 6\nrooster\npush 1\nadd\nbbq\n',
-    '?': 'push 10\npush 6\nrooster\npush 3\nadd\nbbq\n',
-    '@': 'push 8\npush 8\nrooster\nbbq\n',
-    'A': 'push 9\npush 7\nrooster\npush 2\nadd\nbbq\n',
-    'B': 'push 11\npush 6\nrooster\nbbq\n',
-    'C': 'push 11\npush 6\nrooster\npush 1\nadd\nbbq\n',
-    'D': 'push 11\npush 6\nrooster\npush 2\nadd\nbbq\n',
-    'E': 'push 11\npush 6\nrooster\npush 3\nadd\nbbq\n',
-    'F': 'push 10\npush 7\nrooster\nbbq\n',
-    'G': 'push 10\npush 7\nrooster\npush 1\nadd\nbbq\n',
-    'H': 'push 9\npush 8\nrooster\nbbq\n',
-    'I': 'push 9\npush 8\nrooster\npush 1\nadd\nbbq\n',
-    'J': 'push 9\npush 8\nrooster\npush 2\nadd\nbbq\n',
-    'K': 'push 9\npush 8\nrooster\npush 3\nadd\nbbq\n',
-    'L': 'push 9\npush 8\nrooster\npush 4\nadd\nbbq\n',
-    'M': 'push 9\npush 8\nrooster\npush 5\nadd\nbbq\n',
-    'N': 'push 9\npush 8\nrooster\npush 6\nadd\nbbq\n',
-    'O': 'push 9\npush 8\nrooster\npush 7\nadd\nbbq\n',
-    'P': 'push 10\npush 8\nrooster\nbbq\n',
-    'Q': 'push 9\npush 9\nrooster\nbbq\n',
-    'R': 'push 10\npush 8\nrooster\npush 2\nadd\nbbq\n',
-    'S': 'push 10\npush 8\nrooster\npush 3\nadd\nbbq\n',
-    'T': 'push 10\npush 8\nrooster\npush 4\nadd\nbbq\n',
-    'U': 'push 10\npush 8\nrooster\npush 5\nadd\nbbq\n',
-    'V': 'push 10\npush 8\nrooster\npush 6\nadd\nbbq\n',
-    'W': 'push 10\npush 8\nrooster\npush 7\nadd\nbbq\n',
-    'X': 'push 11\npush 8\nrooster\nbbq\n',
-    'Y': 'push 11\npush 8\nrooster\npush 1\nadd\nbbq\n',
-    'Z': 'push 10\npush 9\nrooster\nbbq\n',
-    '[': 'push 10\npush 9\nrooster\npush 1\nadd\nbbq\n',
-    '\\': 'push 10\npush 9\nrooster\npush 2\nadd\nbbq\n',
-    ']': 'push 10\npush 9\nrooster\npush 3\nadd\nbbq\n',
-    '^': 'push 10\npush 9\nrooster\npush 4\nadd\nbbq\n',
-    '_': 'push 10\npush 9\nrooster\npush 5\nadd\nbbq\n',
-    '`': 'push 10\npush 9\nrooster\npush 6\nadd\nbbq\n',
-    'a': 'push 10\npush 10\nrooster\npush 3\nfox\nbbq\n',
-    'b': 'push 10\npush 10\nrooster\npush 2\nfox\nbbq\n',
-    'c': 'push 10\npush 10\nrooster\npush 1\nfox\nbbq\n',
-    'd': 'push 10\npush 10\nrooster\nbbq\n',
-    'e': 'push 10\npush 10\nrooster\npush 1\nadd\nbbq\n',
-    'f': 'push 10\npush 10\nrooster\npush 2\nadd\nbbq\n',
-    'g': 'push 10\npush 10\nrooster\npush 3\nadd\nbbq\n',
-    'h': 'push 10\npush 10\nrooster\npush 4\nadd\nbbq\n',
-    'i': 'push 10\npush 10\nrooster\npush 5\nadd\nbbq\n',
-    'j': 'push 11\npush 10\nrooster\npush 4\nfox\nbbq\n',
-    'k': 'push 11\npush 10\nrooster\npush 3\nfox\nbbq\n',
-    'l': 'push 11\npush 10\nrooster\npush 2\nfox\nbbq\n',
-    'm': 'push 11\npush 10\nrooster\npush 1\nfox\nbbq\n',
-    'n': 'push 11\npush 10\nrooster\nbbq\n',
-    'o': 'push 11\npush 10\nrooster\npush 1\nadd\nbbq\n',
-    'p': 'push 11\npush 10\nrooster\npush 2\nadd\nbbq\n',
-    'q': 'push 11\npush 10\nrooster\npush 3\nadd\nbbq\n',
-    'r': 'push 11\npush 10\nrooster\npush 4\nadd\nbbq\n',
-    's': 'push 11\npush 10\nrooster\npush 5\nadd\nbbq\n',
-    't': 'push 12\npush 10\nrooster\npush 4\nfox\nbbq\n',
-    'u': 'push 12\npush 10\nrooster\npush 3\nfox\nbbq\n',
-    'v': 'push 12\npush 10\nrooster\npush 2\nfox\nbbq\n',
-    'w': 'push 12\npush 10\nrooster\npush 1\nfox\nbbq\n',
-    'x': 'push 12\npush 10\nrooster\nbbq\n',
-    'y': 'push 12\npush 10\nrooster\npush 1\nadd\nbbq\n',
-    'z': 'push 12\npush 10\nrooster\npush 2\nadd\nbbq\n',
-    '{': 'push 12\npush 10\nrooster\npush 3\nadd\nbbq\n',
-    '|': 'push 12\npush 10\nrooster\npush 4\nadd\nbbq\n',
-    '}': 'push 5\npush 5\npush 5\nrooster\nrooster\nbbq\n',
-    '~': 'push 12\npush 10\nrooster\npush 6\nadd\nbbq\n'
-}
+ '\t': 'push9\nbbq',
+ '\n': 'push 10\nbbq\n',
+ '\r': 'push 4\npush 4\nrooster\npush 1\nadd\nbbq\n',
+ ' ': 'push 8\npush 4\nrooster\nbbq\n',
+ '!': 'push 8\npush 4\nrooster\npush 1\nadd\nbbq\n',
+ '"': 'push 8\npush 4\nrooster\npush 2\nadd\nbbq\n',
+ '#': 'push 8\npush 4\nrooster\npush 3\nadd\nbbq\n',
+ '$': 'push 9\npush 4\nrooster\nbbq\n',
+ '%': 'push 9\npush 4\nrooster\npush 1\nadd\nbbq\n',
+ '&': 'push 9\npush 4\nrooster\npush 2\nadd\nbbq\n',
+ "'": 'push 9\npush 4\nrooster\npush 3\nadd\nbbq\n',
+ '(': 'push 8\npush 5\nrooster\nbbq\n',
+ ')': 'push 8\npush 5\nrooster\npush 1\nadd\nbbq\n',
+ '*': 'push 8\npush 5\nrooster\npush 2\nadd\nbbq\n',
+ '+': 'push 8\npush 5\nrooster\npush 3\nadd\nbbq\n',
+ ',': 'push 9\npush 5\nrooster\npush 1\nfox\nbbq\n',
+ '-': 'push 9\npush 5\nrooster\nbbq\n',
+ '.': 'push 9\npush 5\nrooster\npush 1\nadd\nbbq\n',
+ '/': 'push 9\npush 5\nrooster\npush 2\nadd\nbbq\n',
+ '0': 'push 7\npush 7\nrooster\npush 1\nfox\nbbq\n',
+ '1': 'push 7\npush 7\nrooster\nbbq\n',
+ '2': 'push 10\npush 5\nrooster\nbbq\n',
+ '3': 'push 10\npush 5\nrooster\npush 1\nadd\nbbq\n',
+ '4': 'push 10\npush 5\nrooster\npush 2\nadd\nbbq\n',
+ '5': 'push 7\npush 7\nrooster\npush 4\nadd\nbbq\n',
+ '6': 'push 10\npush 5\nrooster\npush 4\nadd\nbbq\n',
+ '7': 'push 11\npush 5\nrooster\nbbq\n',
+ '8': 'push 11\npush 5\nrooster\npush 1\nadd\nbbq\n',
+ '9': 'push 11\npush 5\nrooster\npush 2\nadd\nbbq\n',
+ ':': 'push 10\npush 6\nrooster\npush 2\nfox\nbbq\n',
+ ';': 'push 10\npush 6\nrooster\npush 1\nfox\nbbq\n',
+ '<': 'push 10\npush 6\nrooster\nbbq\n',
+ '=': 'push 10\npush 6\nrooster\npush 1\nadd\nbbq\n',
+ '>': 'push 10\npush 6\nrooster\npush 1\nadd\nbbq\n',
+ '?': 'push 10\npush 6\nrooster\npush 3\nadd\nbbq\n',
+ '@': 'push 8\npush 8\nrooster\nbbq\n',
+ 'A': 'push 9\npush 7\nrooster\npush 2\nadd\nbbq\n',
+ 'B': 'push 11\npush 6\nrooster\nbbq\n',
+ 'C': 'push 11\npush 6\nrooster\npush 1\nadd\nbbq\n',
+ 'D': 'push 11\npush 6\nrooster\npush 2\nadd\nbbq\n',
+ 'E': 'push 11\npush 6\nrooster\npush 3\nadd\nbbq\n',
+ 'F': 'push 10\npush 7\nrooster\nbbq\n',
+ 'G': 'push 10\npush 7\nrooster\npush 1\nadd\nbbq\n',
+ 'H': 'push 9\npush 8\nrooster\nbbq\n',
+ 'I': 'push 9\npush 8\nrooster\npush 1\nadd\nbbq\n',
+ 'J': 'push 9\npush 8\nrooster\npush 2\nadd\nbbq\n',
+ 'K': 'push 9\npush 8\nrooster\npush 3\nadd\nbbq\n',
+ 'L': 'push 9\npush 8\nrooster\npush 4\nadd\nbbq\n',
+ 'M': 'push 9\npush 8\nrooster\npush 5\nadd\nbbq\n',
+ 'N': 'push 9\npush 8\nrooster\npush 6\nadd\nbbq\n',
+ 'O': 'push 9\npush 8\nrooster\npush 7\nadd\nbbq\n',
+ 'P': 'push 10\npush 8\nrooster\nbbq\n',
+ 'Q': 'push 9\npush 9\nrooster\nbbq\n',
+ 'R': 'push 10\npush 8\nrooster\npush 2\nadd\nbbq\n',
+ 'S': 'push 10\npush 8\nrooster\npush 3\nadd\nbbq\n',
+ 'T': 'push 10\npush 8\nrooster\npush 4\nadd\nbbq\n',
+ 'U': 'push 10\npush 8\nrooster\npush 5\nadd\nbbq\n',
+ 'V': 'push 10\npush 8\nrooster\npush 6\nadd\nbbq\n',
+ 'W': 'push 10\npush 8\nrooster\npush 7\nadd\nbbq\n',
+ 'X': 'push 11\npush 8\nrooster\nbbq\n',
+ 'Y': 'push 11\npush 8\nrooster\npush 1\nadd\nbbq\n',
+ 'Z': 'push 10\npush 9\nrooster\nbbq\n',
+ '[': 'push 10\npush 9\nrooster\npush 1\nadd\nbbq\n',
+ '\\': 'push 10\npush 9\nrooster\npush 2\nadd\nbbq\n',
+ ']': 'push 10\npush 9\nrooster\npush 3\nadd\nbbq\n',
+ '^': 'push 10\npush 9\nrooster\npush 4\nadd\nbbq\n',
+ '_': 'push 10\npush 9\nrooster\npush 5\nadd\nbbq\n',
+ '`': 'push 10\npush 9\nrooster\npush 6\nadd\nbbq\n',
+ 'a': 'push 10\npush 10\nrooster\npush 3\nfox\nbbq\n',
+ 'b': 'push 10\npush 10\nrooster\npush 2\nfox\nbbq\n',
+ 'c': 'push 10\npush 10\nrooster\npush 1\nfox\nbbq\n',
+ 'd': 'push 10\npush 10\nrooster\nbbq\n',
+ 'e': 'push 10\npush 10\nrooster\npush 1\nadd\nbbq\n',
+ 'f': 'push 10\npush 10\nrooster\npush 2\nadd\nbbq\n',
+ 'g': 'push 10\npush 10\nrooster\npush 3\nadd\nbbq\n',
+ 'h': 'push 10\npush 10\nrooster\npush 4\nadd\nbbq\n',
+ 'i': 'push 10\npush 10\nrooster\npush 5\nadd\nbbq\n',
+ 'j': 'push 11\npush 10\nrooster\npush 4\nfox\nbbq\n',
+ 'k': 'push 11\npush 10\nrooster\npush 3\nfox\nbbq\n',
+ 'l': 'push 11\npush 10\nrooster\npush 2\nfox\nbbq\n',
+ 'm': 'push 11\npush 10\nrooster\npush 1\nfox\nbbq\n',
+ 'n': 'push 11\npush 10\nrooster\nbbq\n',
+ 'o': 'push 11\npush 10\nrooster\npush 1\nadd\nbbq\n',
+ 'p': 'push 11\npush 10\nrooster\npush 2\nadd\nbbq\n',
+ 'q': 'push 11\npush 10\nrooster\npush 3\nadd\nbbq\n',
+ 'r': 'push 11\npush 10\nrooster\npush 4\nadd\nbbq\n',
+ 's': 'push 11\npush 10\nrooster\npush 5\nadd\nbbq\n',
+ 't': 'push 12\npush 10\nrooster\npush 4\nfox\nbbq\n',
+ 'u': 'push 12\npush 10\nrooster\npush 3\nfox\nbbq\n',
+ 'v': 'push 12\npush 10\nrooster\npush 2\nfox\nbbq\n',
+ 'w': 'push 12\npush 10\nrooster\npush 1\nfox\nbbq\n',
+ 'x': 'push 12\npush 10\nrooster\nbbq\n',
+ 'y': 'push 12\npush 10\nrooster\npush 1\nadd\nbbq\n',
+ 'z': 'push 12\npush 10\nrooster\npush 2\nadd\nbbq\n',
+ '{': 'push 12\npush 10\nrooster\npush 3\nadd\nbbq\n',
+ '|': 'push 12\npush 10\nrooster\npush 4\nadd\nbbq\n',
+ '}': 'push 5\npush 5\npush 5\nrooster\nrooster\nbbq\n',
+ '~': 'push 12\npush 10\nrooster\npush 6\nadd\nbbq\n'
+ }
 
 
 # This is likely to be rather slow due to the instantiation of a parser, but ideally it's only called a few times in a
-# program. I could try moving the symbolCodes to another file and make them the pure chicken constants to speed it up,
-# but that would be quite a little hassle to accomplish, so I won't do it for a while. Not until this proves infeasible.
+# program. I could try making the symbolCodes the pure chicken constants to speed it up, but that would be quite a
+# little hassle to accomplish, so I won't do it for a while. Not until this proves infeasible.
 def chickenifyStr(string: str):
     string = eval(string)
     eggs = ""
@@ -121,12 +120,14 @@ def chickenifyStr(string: str):
     return str(parser)
 
 
+escapedChars = re.compile(r"\\(.)")
+
 """ TODO:
          Take OOP too far
          Make it do anything
          ✓ Come up with better while notation
          ✓ Make blocks work
-         Add more comments
+         ✓ Add more comments
 """
 
 nonExistentFileName = ""
@@ -703,7 +704,7 @@ class EggParse(object):
         """
         p[0] = p[1]
 
-    def p_expr_MATHVAR(self, p):
+    def p_expr_ID(self, p):
         """mathexpr : ID"""
         p[0] = self.consts[p[1]]
 
@@ -719,10 +720,11 @@ class EggParse(object):
         """
         p[0] = p[1]
 
-    def p_CONSTVAL(self):
+    def p_CONSTVAL(self, p):
         """CONSTVAL : STR
                     | mathexpr
         """
+        p[0] = p[1]
 
     def p_IDSTR(self, p):
         """IDSTR : ID
@@ -796,7 +798,7 @@ start = time_ns()
 parsed = parser(
     "const foo = 2^4 / 4\n"
     "const bar = 3\n"
-    "const foo = 4\n"
+    "// const foo = 4\n"
     "push -foo^bar\n"
     "push foo\n"
     "push 2 - 2(3 + 1)\n"
@@ -842,7 +844,7 @@ parsed = parser(
     "repeat_until {\n"
     "   push -1\n"
     "}\n"
-    "~~[====> I wave my sword at thee!\n", debug=1
+    "~~[====> I wave my sword at thee!\n", debug=0
 )  # -->
 #         [Command('PUSH', None, None, -64.0),
 #          Command('PUSH', None, None, 4.0),

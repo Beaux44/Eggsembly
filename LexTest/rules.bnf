@@ -1,0 +1,134 @@
+expressions ::= expressions NEWLINE block
+              | expressions NEWLINE stmt
+              | block
+              | stmt
+
+enter       ::= BUILD FUNC LBRACE
+              | LOOPT      LBRACE
+              | LOOPF      LBRACE
+              | REPW       LBRACE
+              | REPU       LBRACE
+              | IFT        LBRACE
+              | IFF        LBRACE
+
+block       ::= enter NEWLINE expressions NEWLINE RBRACE
+
+keyword     ::= AXE
+              | CHICKEN
+              | ADD
+              | FOX
+              | ROOSTER
+              | COMPARE
+              | PICK
+              | PECK
+              | FR
+              | BBQ
+
+stmt        ::= keyword
+              | PICK INT
+              | PECK INT
+              | HATCH FUNC
+              | PUSH STR
+              | PUSH mathexpr
+              | IDSTR AS IDSTR
+              | ID LBRACK INT RBRACK EQ VAL
+              | ID EQ VAL
+              | ID LBRACK INT RBRACK
+              | ID
+              | CONST ID EQ CONSTVAL
+              |
+
+IDSTR       ::= ID
+              | STR
+
+FUNC        ::= ID DOT FUNC
+              | ID
+
+VAL         ::= TOP
+              | CONSTVAL
+
+CONSTVAL    ::= STR
+              | mathexpr
+
+mathexpr    ::= mathexpr ADDE mathexpr
+              | mathexpr SUB  mathexpr
+              | mathexpr MUL  mathexpr
+              | mathexpr DIV  mathexpr
+              | mathexpr FDIV mathexpr
+              | mathexpr MOD  mathexpr
+              | mathexpr POW  mathexpr
+              | LPAREN mathexpr RPAREN
+              | mathexpr LPAREN mathexpr RPAREN
+              | SUB mathexpr
+              | ADDE mathexpr
+              | ID
+              | INT
+              | FLOAT
+
+ADDE        ::= "+"
+SUB         ::= "-"
+MUL         ::= "*"
+DIV         ::= "/"
+FDIV        ::= "\\"
+MOD         ::= "%"
+POW         ::= "^"
+DOT         ::= "."
+EQ          ::= "="
+LPAREN      ::= "("
+RPAREN      ::= ")"
+LBRACK      ::= "["
+RBRACK      ::= "]"
+LBRACE      ::= "{"
+RBRACE      ::= "{"
+TOP         ::= "Top"
+CONST       ::= "const"
+HATCH       ::= "hatch"
+AS          ::= "as"
+BUILD       ::= "build"
+LOOPT       ::= "loop_true"
+LOOPF       ::= "loop_false"
+REPW        ::= "repeat_while"
+REPU        ::= "repeat_until"
+IFT         ::= "if_true"
+IFF         ::= "if_false"
+
+
+AXE         ::= "axe"
+CHICKEN     ::= "chicken"
+ADD         ::= "add"
+FOX         ::= "fox"
+ROOSTER     ::= "rooster"
+COMPARE     ::= "compare"
+PICK        ::= "pick"
+PECK        ::= "peck"
+PUSH        ::= "push"
+FR          ::= "fr"
+BBQ         ::= "bbq"
+
+STR         ::= string1 | string2
+ID          ::= alunder | ID alnumunder
+digit       ::= 1|2|3|4|5|6|7|8|9
+INT         ::= digit+
+FLOAT       ::= [INT] DOT  INT
+              |  INT  DOT [INT]
+
+
+
+letter      ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M"
+              | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+              | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m"
+              | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+symbol      ::= "|" | " " | "!" | "#" | "$" | "%" | "&" | "("
+              | ")" | "*" | "+" | "," | "-" | "." | "/" | ":"
+              | ";" | ">" | "=" | "<" | "?" | "@" | "[" |"\\"
+              | "]" | "^" | "_" | "`" | "{" | "}" | "~"
+
+
+alnum       ::= letter | digit
+alunder     ::= letter | "_"
+alnumunder  ::= alnum  | "_"
+any         ::= letter | digit | symbol
+strchrs1    ::= any    | "'"     | '\"'
+strchrs2    ::= any    | '"'     | "\'"
+string1     ::= any    | strchrs1 any
+string2     ::= any    | strchrs2 any
