@@ -131,6 +131,7 @@ def chickenifyStr(string: str):
 
 nonExistentFileName = ""
 
+# Import colorama if it exists, otherwise make cprint equivalent to print
 try:
     import colorama
 
@@ -240,6 +241,7 @@ mathexpr : mathexpr ADDE mathexpr
 """
 
 
+# Used to simplify Chicken compilation
 class Command(object):
     def __init__(self, type, ident=None, index=None, val=None):
         self.type: str = type
@@ -251,7 +253,7 @@ class Command(object):
     def __repr__(self):
         return "Command(%r, %r, %r, %r)" % (self.type, self.ident, self.index, self.value)
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:    # Compiles command object to equivalent Chicken code
         if self.code is not None:
             return self.code.__iter__()
         if self.type in baseCommands:
@@ -277,6 +279,7 @@ class Command(object):
         yield self
 
 
+# Contains a number of Commands
 class Block(object):
     def __init__(self, sort: Tuple[str, str], code: List[Command]):
         self.type = sort
@@ -285,7 +288,7 @@ class Block(object):
     def __repr__(self):
         return "Block(%r, code)" % (self.type,)
 
-    def __str__(self):
+    def __str__(self):  # Compiles all contained Commands and self to equivalent Chicken
         chicken = ""
         for i in self:
             chicken += str(i)
@@ -358,6 +361,7 @@ class ChickenCode(object):
         return self.code.__iter__()
 
 
+# Class that is used to lex Eggsembly
 class EggLex(object):
     def __init__(self, **kwargs):
         self.lexer: lex.Lexer = lex.lex(module=self, **kwargs)
@@ -380,7 +384,7 @@ class EggLex(object):
     def __str__(self):
         return str(self.code)
 
-    def findColumn(self, t: lex.LexToken) -> int:
+    def findColumn(self, t: lex.LexToken) -> int:       # Finds column of given token, used for Syntax Errors
         line_start = self.data.rfind('\n', 0, t.lexpos)
         return (t.lexpos - line_start) - 1
 
@@ -510,11 +514,12 @@ class EggParse(object):
         self.parser.lineno = 1
         self.code = ChickenCode()
 
+    # Takes Eggsembly program string as data argument, parses and returns it
     def __call__(self, data: str, **kwargs) -> List[Union[Command, Block]]:
         self.data = self.lexer.data = data
         return self.parser.parse(self.data, lexer=self.lexer.lexer, **kwargs)
 
-    def __str__(self):
+    def __str__(self):        # This is what *actually* compiles an Eggsembly program, used after calling the object
         return str(self.code)
 
     tokens = EggLex.tokens
@@ -529,12 +534,13 @@ class EggParse(object):
     )
 
     def p_ignore(self, p):
-        " \t"
+        """ \t"""
 
     def p_error(self, p):
         cprint(ERROR, "Syntax error on line %d:\n\t%s" % (self.lexer.lineno,
                                                           self.data.split("\n")[self.lexer.lineno - 1].strip()))
 
+    # The main syntax of the language,
     def p_program(self, p):
         """expressions : expressions NEWLINE block
                        | expressions NEWLINE stmt
@@ -785,6 +791,8 @@ print(*map(lambda a: f"Line {a[0]}: {a[1]}", enumerate(lexed, 1)), sep="\n")
 print("\nTook", (end - start) / 10 ** 6, "milliseconds\n\n")
 
 start = time_ns()
+
+# Parses the show Eggsembly program and assigns it to parsed
 parsed = parser(
     "const foo = 2^4 / 4\n"
     "const bar = 3\n"
