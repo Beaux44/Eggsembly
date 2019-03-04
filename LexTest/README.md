@@ -8,3 +8,4 @@ that would have been virtually impossible to do previously.
 - Make it do anything
 - ~~Come up with better while notation~~
 - ~~Make blocks work~~
+- Add more comments

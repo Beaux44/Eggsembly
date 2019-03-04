@@ -154,7 +154,7 @@ CALL     = re.compile(r"^[ \t]*hatch ([A-Za-z0-9._]+)$")
 IF       = re.compile(r"^[ \t]*if(true|false)[ \t]*{$")
 ELSE     = re.compile(r"^[ \t]*}[ \t]*else[ \t]*{$")
 COMMENT  = re.compile(
-    r"(?<![A-Za-z0-9\ \"\'{])([\ \t]*//.*\n?)|([\ \t]*//.*?(?=\n))|(?<![A-Za-z0-9\ \"\'{]])([\ \t]*/\*.*?(?:(?=\*/)\*/|$)\n*)|([\ \t]*/\*.*?(?:(?=\*/)\*/|$))(?=\n*)|(?<![A-Za-z0-9\ \"\'{])([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$)\n*)|([\ \t]*~~\[==.*?(?:(?===\]~~)==\]~~|$))(?=\n*)",
+    r"(//[^\n]*|/\*.*?(?:\*/|$)|~~\[==.*?(?:==\]~~/|$))",
     re.S)
 VARIABLE = re.compile(r"^(?:(?P<name>[A-Za-z0-9_]+)(?:\[(?P<index>\d+)\])?(?:\s*?=\s*?(?P<value>Top|(?P<assquote>[\"'])(?P<str>(?:(?=(?P<slash>\\?))(?P=slash)[ -~])*?)(?P=assquote)|\d+))?)$") # "assquote" is short for assignment quote :3
 VARS     = {"stack": 0, "input": 1}
