@@ -1,0 +1,59 @@
+const foo = 2^4 / 4
+const bar = 3
+push -foo^bar
+push foo
+push 2 - 2(3 + 1)
+push ((2-1)^bar)^foo
+push foo*bar*foo^2
+push bar*foo*bar*foo
+push (bar(foo(bar(foo))))
+push '3'
+a as b
+x as y
+axe
+chicken
+add
+fox
+rooster
+compare
+pick
+pick 5
+peck
+pick 3
+fr
+bbq
+baz = foo*bar/2.0^2
+build qux {
+   hatch ab.a
+   a[2] = '3'
+   a
+   if_true {
+       loop_false {
+           b = Top
+       }
+   }
+   b
+
+   push foo
+   rooster
+   a = Top
+} // blah
+if_true {
+   push foo
+}
+if_false {
+   push bar
+}
+loop_true {
+   push 2
+}
+loop_false {
+   push 1
+}
+repeat_while {
+   push 0
+}
+repeat_until {
+   push -1
+}
+~~[====> I wave my sword at thee!

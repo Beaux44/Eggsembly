@@ -1,108 +1,7 @@
 import ply.lex as lex, ply.yacc as yacc, re
 from pprint import pprint
-from typing import Union, List, Dict, Tuple
-
-
-symbolCodes = {
- '\t': 'push9\nbbq',
- '\n': 'push 10\nbbq\n',
- '\r': 'push 4\npush 4\nrooster\npush 1\nadd\nbbq\n',
- ' ': 'push 8\npush 4\nrooster\nbbq\n',
- '!': 'push 8\npush 4\nrooster\npush 1\nadd\nbbq\n',
- '"': 'push 8\npush 4\nrooster\npush 2\nadd\nbbq\n',
- '#': 'push 8\npush 4\nrooster\npush 3\nadd\nbbq\n',
- '$': 'push 9\npush 4\nrooster\nbbq\n',
- '%': 'push 9\npush 4\nrooster\npush 1\nadd\nbbq\n',
- '&': 'push 9\npush 4\nrooster\npush 2\nadd\nbbq\n',
- "'": 'push 9\npush 4\nrooster\npush 3\nadd\nbbq\n',
- '(': 'push 8\npush 5\nrooster\nbbq\n',
- ')': 'push 8\npush 5\nrooster\npush 1\nadd\nbbq\n',
- '*': 'push 8\npush 5\nrooster\npush 2\nadd\nbbq\n',
- '+': 'push 8\npush 5\nrooster\npush 3\nadd\nbbq\n',
- ',': 'push 9\npush 5\nrooster\npush 1\nfox\nbbq\n',
- '-': 'push 9\npush 5\nrooster\nbbq\n',
- '.': 'push 9\npush 5\nrooster\npush 1\nadd\nbbq\n',
- '/': 'push 9\npush 5\nrooster\npush 2\nadd\nbbq\n',
- '0': 'push 7\npush 7\nrooster\npush 1\nfox\nbbq\n',
- '1': 'push 7\npush 7\nrooster\nbbq\n',
- '2': 'push 10\npush 5\nrooster\nbbq\n',
- '3': 'push 10\npush 5\nrooster\npush 1\nadd\nbbq\n',
- '4': 'push 10\npush 5\nrooster\npush 2\nadd\nbbq\n',
- '5': 'push 7\npush 7\nrooster\npush 4\nadd\nbbq\n',
- '6': 'push 10\npush 5\nrooster\npush 4\nadd\nbbq\n',
- '7': 'push 11\npush 5\nrooster\nbbq\n',
- '8': 'push 11\npush 5\nrooster\npush 1\nadd\nbbq\n',
- '9': 'push 11\npush 5\nrooster\npush 2\nadd\nbbq\n',
- ':': 'push 10\npush 6\nrooster\npush 2\nfox\nbbq\n',
- ';': 'push 10\npush 6\nrooster\npush 1\nfox\nbbq\n',
- '<': 'push 10\npush 6\nrooster\nbbq\n',
- '=': 'push 10\npush 6\nrooster\npush 1\nadd\nbbq\n',
- '>': 'push 10\npush 6\nrooster\npush 1\nadd\nbbq\n',
- '?': 'push 10\npush 6\nrooster\npush 3\nadd\nbbq\n',
- '@': 'push 8\npush 8\nrooster\nbbq\n',
- 'A': 'push 9\npush 7\nrooster\npush 2\nadd\nbbq\n',
- 'B': 'push 11\npush 6\nrooster\nbbq\n',
- 'C': 'push 11\npush 6\nrooster\npush 1\nadd\nbbq\n',
- 'D': 'push 11\npush 6\nrooster\npush 2\nadd\nbbq\n',
- 'E': 'push 11\npush 6\nrooster\npush 3\nadd\nbbq\n',
- 'F': 'push 10\npush 7\nrooster\nbbq\n',
- 'G': 'push 10\npush 7\nrooster\npush 1\nadd\nbbq\n',
- 'H': 'push 9\npush 8\nrooster\nbbq\n',
- 'I': 'push 9\npush 8\nrooster\npush 1\nadd\nbbq\n',
- 'J': 'push 9\npush 8\nrooster\npush 2\nadd\nbbq\n',
- 'K': 'push 9\npush 8\nrooster\npush 3\nadd\nbbq\n',
- 'L': 'push 9\npush 8\nrooster\npush 4\nadd\nbbq\n',
- 'M': 'push 9\npush 8\nrooster\npush 5\nadd\nbbq\n',
- 'N': 'push 9\npush 8\nrooster\npush 6\nadd\nbbq\n',
- 'O': 'push 9\npush 8\nrooster\npush 7\nadd\nbbq\n',
- 'P': 'push 10\npush 8\nrooster\nbbq\n',
- 'Q': 'push 9\npush 9\nrooster\nbbq\n',
- 'R': 'push 10\npush 8\nrooster\npush 2\nadd\nbbq\n',
- 'S': 'push 10\npush 8\nrooster\npush 3\nadd\nbbq\n',
- 'T': 'push 10\npush 8\nrooster\npush 4\nadd\nbbq\n',
- 'U': 'push 10\npush 8\nrooster\npush 5\nadd\nbbq\n',
- 'V': 'push 10\npush 8\nrooster\npush 6\nadd\nbbq\n',
- 'W': 'push 10\npush 8\nrooster\npush 7\nadd\nbbq\n',
- 'X': 'push 11\npush 8\nrooster\nbbq\n',
- 'Y': 'push 11\npush 8\nrooster\npush 1\nadd\nbbq\n',
- 'Z': 'push 10\npush 9\nrooster\nbbq\n',
- '[': 'push 10\npush 9\nrooster\npush 1\nadd\nbbq\n',
- '\\': 'push 10\npush 9\nrooster\npush 2\nadd\nbbq\n',
- ']': 'push 10\npush 9\nrooster\npush 3\nadd\nbbq\n',
- '^': 'push 10\npush 9\nrooster\npush 4\nadd\nbbq\n',
- '_': 'push 10\npush 9\nrooster\npush 5\nadd\nbbq\n',
- '`': 'push 10\npush 9\nrooster\npush 6\nadd\nbbq\n',
- 'a': 'push 10\npush 10\nrooster\npush 3\nfox\nbbq\n',
- 'b': 'push 10\npush 10\nrooster\npush 2\nfox\nbbq\n',
- 'c': 'push 10\npush 10\nrooster\npush 1\nfox\nbbq\n',
- 'd': 'push 10\npush 10\nrooster\nbbq\n',
- 'e': 'push 10\npush 10\nrooster\npush 1\nadd\nbbq\n',
- 'f': 'push 10\npush 10\nrooster\npush 2\nadd\nbbq\n',
- 'g': 'push 10\npush 10\nrooster\npush 3\nadd\nbbq\n',
- 'h': 'push 10\npush 10\nrooster\npush 4\nadd\nbbq\n',
- 'i': 'push 10\npush 10\nrooster\npush 5\nadd\nbbq\n',
- 'j': 'push 11\npush 10\nrooster\npush 4\nfox\nbbq\n',
- 'k': 'push 11\npush 10\nrooster\npush 3\nfox\nbbq\n',
- 'l': 'push 11\npush 10\nrooster\npush 2\nfox\nbbq\n',
- 'm': 'push 11\npush 10\nrooster\npush 1\nfox\nbbq\n',
- 'n': 'push 11\npush 10\nrooster\nbbq\n',
- 'o': 'push 11\npush 10\nrooster\npush 1\nadd\nbbq\n',
- 'p': 'push 11\npush 10\nrooster\npush 2\nadd\nbbq\n',
- 'q': 'push 11\npush 10\nrooster\npush 3\nadd\nbbq\n',
- 'r': 'push 11\npush 10\nrooster\npush 4\nadd\nbbq\n',
- 's': 'push 11\npush 10\nrooster\npush 5\nadd\nbbq\n',
- 't': 'push 12\npush 10\nrooster\npush 4\nfox\nbbq\n',
- 'u': 'push 12\npush 10\nrooster\npush 3\nfox\nbbq\n',
- 'v': 'push 12\npush 10\nrooster\npush 2\nfox\nbbq\n',
- 'w': 'push 12\npush 10\nrooster\npush 1\nfox\nbbq\n',
- 'x': 'push 12\npush 10\nrooster\nbbq\n',
- 'y': 'push 12\npush 10\nrooster\npush 1\nadd\nbbq\n',
- 'z': 'push 12\npush 10\nrooster\npush 2\nadd\nbbq\n',
- '{': 'push 12\npush 10\nrooster\npush 3\nadd\nbbq\n',
- '|': 'push 12\npush 10\nrooster\npush 4\nadd\nbbq\n',
- '}': 'push 5\npush 5\npush 5\nrooster\nrooster\nbbq\n',
- '~': 'push 12\npush 10\nrooster\npush 6\nadd\nbbq\n'
- }
+from typing import Union, List, Dict, Tuple, Callable
+from extras import symbolCodes
 
 
 # This is likely to be rather slow due to the instantiation of a parser, but ideally it's only called a few times in a
@@ -119,17 +18,7 @@ def chickenifyStr(string: str):
     parser(eggs)
     return str(parser)
 
-
 escapedChars = re.compile(r"\\(.)")
-
-""" TODO:
-         Take OOP too far
-         Make it do anything
-         ✓ Come up with better while notation
-         ✓ Make blocks work
-         ✓ Add more comments
-"""
-
 nonExistentFileName = ""
 
 # Import colorama if it exists, otherwise make cprint equivalent to print
@@ -362,137 +251,6 @@ class ChickenCode(object):
         return self.code.__iter__()
 
 
-# Class that is used to lex Eggsembly
-class EggLex(object):
-    def __init__(self, **kwargs):
-        self.lexer: lex.Lexer = lex.lex(module=self, **kwargs)
-        self.lineno: int = self.lexer.lineno
-
-    def __call__(self, data: str):
-        self.data: str = data
-        self.lexer.input(data)
-        line = 0
-        toks: List[List[lex.LexToken]] = [[]]
-        tok: lex.LexToken = self.lexer.token()
-        while tok:
-            toks[line] += [tok]
-            if tok.type == "NEWLINE":
-                line += 1
-                toks += [[]]
-            tok = self.lexer.token()
-        return [*map(tuple, toks)]
-
-    def __str__(self):
-        return str(self.code)
-
-    def findColumn(self, t: lex.LexToken) -> int:       # Finds column of given token, used for Syntax Errors
-        line_start = self.data.rfind('\n', 0, t.lexpos)
-        return (t.lexpos - line_start) - 1
-
-    def t_error(self, t: lex.LexToken) -> None:
-        cprint(ERROR,
-               ("Invalid symbol in file %r on line %d, column %d:\n"
-                "\t%s\n\t") % (nonExistentFileName,
-                               t.lexer.lineno,
-                               self.findColumn(t),
-                               self.data.split("\n")[t.lexer.lineno - 1])
-               + ' ' * (self.findColumn(t) - 1) + "^")  # .center(len(t.value.split('\n')[0]), "~"))
-        exit(0)
-
-    reserved = {
-        'axe': 'AXE',
-        'chicken': 'CHICKEN',
-        'add': 'ADD',
-        'fox': 'FOX',
-        'rooster': 'ROOSTER',
-        'compare': 'COMPARE',
-        'pick': 'PICK',
-        'peck': 'PECK',
-        'fr': 'FR',
-        'bbq': 'BBQ',
-        'as': 'AS',
-        'push': 'PUSH',
-        'hatch': 'HATCH',
-        'build': 'BUILD',
-        'Top': 'TOP',
-        'loop_true': 'LOOPT',
-        'loop_false': 'LOOPF',
-        'repeat_while': 'REPW',
-        'repeat_until': 'REPU',
-        'if_true': 'IFT',
-        'if_false': 'IFF',
-        'const': 'CONST',
-    }
-
-    tokens = ['INT',
-              'STR',
-              'ID',
-              'EQ',
-              'DOT',
-              'ADDE',
-              'SUB',
-              'DIV',
-              'FDIV',
-              'MUL',
-              'MOD',
-              'POW',
-              'FLOAT',
-              'LPAREN',
-              'LBRACE',
-              'LBRACK',
-              'RPAREN',
-              'RBRACE',
-              'RBRACK',
-              'NEWLINE',
-              ] + [*reserved.values()]
-
-    def t_ignore_COMMENT(self, t: lex.LexToken) -> None:
-        r'(//[^\n]*|/\*(?:.|\n)*?(?:\*/|\Z)|~~\[==(?:.|\n)*?(?:==\]~~/|\Z))'
-
-    t_ignore = ' \t'
-
-    literals = "()[]{}.=\\/+-*^"
-    t_EQ = r'='
-    t_DOT = r'\.'
-    t_ADDE = r'\+'
-    t_SUB = r'-'
-    t_MUL = r'\*'
-    t_DIV = r'/'
-    t_MOD = r'%'
-    t_FDIV = r'\\'
-    t_POW = r'\^'
-    t_LPAREN = r'\('
-    t_LBRACE = r'{'
-    t_LBRACK = r'\['
-    t_RPAREN = r'\)'
-    t_RBRACE = r'}'
-    t_RBRACK = r']'
-
-    def t_NEWLINE(self, t: lex.LexToken) -> lex.LexToken:
-        r'(?:\r?\n)+'
-        t.lexer.lineno += t.value.count("\n")
-        self.lineno = t.lexer.lineno
-        t.value = t.value.count("\n")
-        return t
-
-    def t_FLOAT(self, t: lex.LexToken) -> lex.LexToken:
-        r'(?:\d+\.\d*|\d*\.\d+)'
-        t.value = float(t.value)
-        return t
-
-    def t_INT(self, t: lex.LexToken) -> lex.LexToken:
-        r'\b\d+'
-        t.value = int(t.value)
-        return t
-
-    def t_ID(self, t: lex.LexToken) -> lex.LexToken:
-        r'\b([A-Za-z_]\w*)\b'
-        t.type = self.reserved.get(t.value, 'ID')
-        return t
-
-    t_STR = r'(?P<quote>["\'])(?P<str>(?:(?=(?P<slash>\\?))(?P=slash)[ -~])+?)(?P=quote)'
-
-
 def flatten(a: list) -> list:
     b = []
     for i in a:
@@ -504,11 +262,16 @@ def flatten(a: list) -> list:
     return b
 
 
+floatOrInt = Union[float, int]
+floatIntOrString = Union[floatOrInt, str]
+
+
 class EggParse(object):
     def __init__(self, **kwargs):
         self.vars: Dict[str, Union[int, float, str]] = {}
         self.funcs: Dict[str, Block] = {}
-        self.consts: Dict[str, Union[int, float, str]] = {}
+        self.mfuncs: Dict[str, Callable[[floatOrInt, ...], floatOrInt]] = {}
+        self.consts: Dict[str, floatIntOrString] = {}
 
         self.lexer = EggLex()
         self.parser: yacc.LRParser = yacc.yacc(module=self, debug=False, write_tables=False, **kwargs)
@@ -554,31 +317,31 @@ class EggParse(object):
             p[0] = p[1]
 
     def p_enter_block_build(self, p):
-        "enter : BUILD FUNC LBRACE"
+        """enter : BUILD FUNC LBRACE"""
         p[0] = ("BUILD", p[2])
 
     def p_enter_block_loopt(self, p):
-        "enter : LOOPT LBRACE"
+        """enter : LOOPT LBRACE"""
         p[0] = ("LOOP", "TRUE")
 
     def p_enter_block_loopf(self, p):
-        "enter : LOOPF LBRACE"
+        """enter : LOOPF LBRACE"""
         p[0] = ("LOOP", "FALSE")
 
     def p_enter_block_rept(self, p):
-        "enter : REPW LBRACE"
+        """enter : REPW LBRACE"""
         p[0] = ("REPEAT", "TRUE")
 
     def p_enter_block_repf(self, p):
-        "enter : REPU LBRACE"
+        """enter : REPU LBRACE"""
         p[0] = ("REPEAT", "FALSE")
 
     def p_enter_block_ift(self, p):
-        "enter : IFT LBRACE"
+        """enter : IFT LBRACE"""
         p[0] = ("IF", "TRUE")
 
     def p_enter_block_iff(self, p):
-        "enter : IFF LBRACE"
+        """enter : IFF LBRACE"""
         p[0] = ("IF", "FALSE")
 
     def p_block(self, p):
@@ -611,7 +374,7 @@ class EggParse(object):
         # self.code += p[0]
 
     def p_stmt_HATCH(self, p):
-        "stmt : HATCH FUNC"
+        """stmt : HATCH FUNC"""
         p[0] = Command("HATCH", p[2])
 
     def p_stmt_PUSH(self, p):
@@ -622,7 +385,7 @@ class EggParse(object):
         # self.code += p[0]
 
     def p_stmt_AS(self, p):
-        "stmt : IDSTR AS IDSTR"
+        """stmt : IDSTR AS IDSTR"""
         p[0] = Command("AS", (p[1], p[3]))
         # self.code += p[0]
 
@@ -650,6 +413,10 @@ class EggParse(object):
             self.consts[p[2]] = p[4]
         else:
             raise ConstChangedError("Constant %r redefined" % p[2])
+
+    # def p_stmt_SETFUNCT(self, p):
+    #     """stmt : FUNCT ID EQ CONSTVAL"""
+
 
     def p_stmt_BLANKLINE(self, p):
         """stmt : """
@@ -732,62 +499,26 @@ class EggParse(object):
         """
         p[0] = p[1]
 
+    # def p_TUPLE(self, p):
+    #     """TUPLE : TUPLE COM mathexpr
+    #              | mathexpr
+    #     """
+    #     if len(p) == 4:
+    #         p[0] = (*p[1], p[3])
+    #     else:
+    #         p[0] = (p[1],)
+
+
+
 
 lexer = EggLex()
 parser = EggParse()
 
 from time import time_ns
+blah = open('blah.eggs', 'r').read()
 
 start = time_ns()
-lexed = lexer(
-    "const foo = 2^4 / 4\n"
-    "const bar = 3\n"
-    "push -foo^bar\n"
-    "push foo\n"
-    "push 2 - 2(3 + 1)\n"
-    "push ((2-1)^bar)^foo\n"
-    "push foo*bar*foo^2\n"
-    "push bar*foo*bar*foo\n"
-    "push (bar(foo(bar(foo))))\n"
-    "push '3'\n"
-    "a as b\n"
-    "x as y\n"
-    "axe\nchicken\nadd\nfox\nrooster\ncompare\npick\npick 5\npeck\npick 3\nfr\nbbq\n"
-    "baz = foo*bar/2.0^2\n"
-    "build qux {\n"
-    "   hatch ab.a\n"
-    "   a[2] = '3'\n"
-    "   a\n"
-    "   if_true {\n"
-    "       loop_false {\n"
-    "           b = Top\n"
-    "       }\n"
-    "   }\n"
-    "   b\n"
-    "\n"
-    "   push foo\n"
-    "   rooster\n"
-    "   a = Top\n"
-    "} // blah\n"
-    "if_false {\n"
-    "   push bar\n"
-    "}\n"
-    "if_true {\n"
-    "   push foo\n"
-    "}\n"
-    "loop_true {\n"
-    "   push 2\n"
-    "}\n"
-    "loop_false {\n"
-    "   push 1\n"
-    "}\n"
-    "repeat_while {\n"
-    "   push 0\n"
-    "}\n"
-    "repeat_until {\n"
-    "   push -1\n"
-    "}\n"
-)
+lexed = lexer(blah)
 end = time_ns()
 print(*map(lambda a: f"Line {a[0]}: {a[1]}", enumerate(lexed, 1)), sep="\n")
 print("\nTook", (end - start) / 10 ** 6, "milliseconds\n\n")
@@ -795,57 +526,7 @@ print("\nTook", (end - start) / 10 ** 6, "milliseconds\n\n")
 start = time_ns()
 
 # Parses the show Eggsembly program and assigns it to parsed
-parsed = parser(
-    "const foo = 2^4 / 4\n"
-    "const bar = 3\n"
-    "// const foo = 4\n"
-    "push -foo^bar\n"
-    "push foo\n"
-    "push 2 - 2(3 + 1)\n"
-    "push ((2-1)^bar)^foo\n"
-    "push foo*bar*foo^2\n"
-    "push bar*foo*bar*foo\n"
-    "push (bar(foo(bar(foo))))\n"
-    "push '3'\n"
-    "a as b\n"
-    "x as y\n"
-    "axe\nchicken\nadd\nfox\nrooster\ncompare\npick\npick 5\npeck\npick 3\nfr\nbbq\n"
-    "baz = foo*bar/2.0^2\n"
-    "build qux {\n"
-    "   hatch ab.a\n"
-    "   a[2] = '3'\n"
-    "   a\n"
-    "   if_true {\n"
-    "       loop_false {\n"
-    "           b = Top\n"
-    "       }\n"
-    "   }\n"
-    "   b\n"
-    "\n"
-    "   push foo\n"
-    "   rooster\n"
-    "   a = Top\n"
-    "} // blah\n"
-    "if_true {\n"
-    "   push foo\n"
-    "}\n"
-    "if_false {\n"
-    "   push bar\n"
-    "}\n"
-    "loop_true {\n"
-    "   push 2\n"
-    "}\n"
-    "loop_false {\n"
-    "   push 1\n"
-    "}\n"
-    "repeat_while {\n"
-    "   push 0\n"
-    "}\n"
-    "repeat_until {\n"
-    "   push -1\n"
-    "}\n"
-    "~~[====> I wave my sword at thee!\n", debug=0
-)  # -->
+parsed = parser(blah, debug=0)  # -->
 #         [Command('PUSH', None, None, -64.0),
 #          Command('PUSH', None, None, 4.0),
 #          Command('PUSH', None, None, -6),
