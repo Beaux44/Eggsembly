@@ -9,7 +9,7 @@ Eggsembly is a programming language that aims to make programming in [Chicken](h
 Eggsembly code is compiled into equivalent Chicken code which can then be run using either the interpreter that's along side the compiler, or the [original version](http://web.archive.org/web/20180420010853/http://torso.me/chicken). The ability for the compiled code to be run by either version is not handled by the compiler, so you will need to design your code for the version you want to be able to run it. Some examples can be run on the original, some can only run on the packaged interpreter.
 
 ### How can I run an Eggsembly program?
-You can either use the [Online Interpreter/IDE](https://eggsembly-online-interpreter--sheep44.repl.co) (currently with nearly 0% uptime!), or, assuming you have a compatible version of Python *(tested and developed with 3.7)* and required modules, you can copy the [/src/](/src/) directory and use the `eggs.py` file to run or compile your program. You can run `py eggs.py -h` for help using it.
+You can either use the [Online Interpreter/IDE](https://eggsembly-online-interpreter--sheep44.repl.co) (currently with nearly 0% uptime!), [here](https://eggsembly-online-interpreter--sheep44.repl.co/?code=7dd4936e19785db7b61aca31d271eabf03c8db639f7f32e87c2d4e20)'s an example of a program I made using it; or, assuming you have a compatible version of Python *(tested and developed with 3.7)* and required modules, you can copy the [/src/](/src/) directory and use the `eggs.py` file to run or compile your program. You can run `py eggs.py -h` for help using it.
 
 ### How often is this updated?
 Regular development is temporarily on hiatus while I revamp the parser, however it's generally whenever I want to update it; I'm not sure how often that is.
