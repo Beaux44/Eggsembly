@@ -1,13 +1,13 @@
-from extras import cprint, ERROR
+from .extras import cprint, ERROR, List
 import ply.lex as lex
 
+__all__ = ["EggLex"]
 
-nonExistentFileName = ''
 
-
-# Class that is used to lex Eggsembly
 class EggLex(object):
-    def __init__(self, **kwargs):
+    """Class for lexing Eggsembly"""
+    def __init__(self, file, **kwargs):
+        self.file = file
         self.lexer: lex.Lexer = lex.lex(module=self, **kwargs)
         self.lineno: int = self.lexer.lineno
 
@@ -18,24 +18,25 @@ class EggLex(object):
         toks: List[List[lex.LexToken]] = [[]]
         tok: lex.LexToken = self.lexer.token()
         while tok:
-            toks[line] += [tok]
             if tok.type == "NEWLINE":
                 line += 1
                 toks += [[]]
+            else:
+                toks[line] += [tok]
             tok = self.lexer.token()
         return [*map(tuple, toks)]
 
     def __str__(self):
         return str(self.code)
 
-    def findColumn(self, t: lex.LexToken) -> int:       # Finds column of given token, used for Syntax Errors
+    def findColumn(self, t: lex.LexToken) -> int:  # Finds column of given token, used for Syntax Errors
         line_start = self.data.rfind('\n', 0, t.lexpos)
         return (t.lexpos - line_start) - 1
 
     def t_error(self, t: lex.LexToken) -> None:
         cprint(ERROR,
                ("Invalid symbol in file %r on line %d, column %d:\n"
-                "\t%s\n\t") % (nonExistentFileName,
+                "\t%s\n\t") % (self.file,
                                t.lexer.lineno,
                                self.findColumn(t),
                                self.data.split("\n")[t.lexer.lineno - 1])
@@ -65,7 +66,7 @@ class EggLex(object):
         'if_true': 'IFT',
         'if_false': 'IFF',
         'const': 'CONST',
-        'func': 'FUNCT',
+        'let': 'LET',
     }
 
     tokens = ['INT',
@@ -92,7 +93,8 @@ class EggLex(object):
               ] + [*reserved.values()]
 
     def t_ignore_COMMENT(self, t: lex.LexToken) -> None:
-        r'(//[^\n]*|/\*(?:.|\n)*?(?:\*/|\Z)|~~\[==(?:.|\n)*?(?:==\]~~/|\Z))'
+        r'//[^\n]*|/\*(?:.|\n)*?(?:\*/|\Z)|~~\[==(?:.|\n)*?(?:==\]~~|\Z)'
+        self.lexer.lineno += t.value.count("\n")
 
     t_ignore = ' \t'
 
@@ -137,4 +139,3 @@ class EggLex(object):
         return t
 
     t_STR = r'(?P<quote>["\'])(?P<str>(?:(?=(?P<slash>\\?))(?P=slash)[ -~])+?)(?P=quote)'
-

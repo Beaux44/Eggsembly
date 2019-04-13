@@ -1,0 +1,2 @@
+import Eggsembly
+Eggsembly.main()
