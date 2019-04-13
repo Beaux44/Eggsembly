@@ -20,6 +20,9 @@ I have created a number of different terms regarding Eggsembly to make it ~~more
 ### What are the limits of Eggsembly?
 Eggsembly is capable of doing anything theoretically possible to do in Chicken.
 
+### Why?
+Chicken
+
 ---
 
 ## Standard Eggsembly commands
