@@ -1,5 +1,9 @@
-from typing import Union, Tuple, List
+from typing import Union, Tuple, List, Dict, Callable
 import re
+
+__all__ = ["Union", "Tuple", "List", "Dict", "Callable", "symbolCodes", "chickenifyStr", "baseCommands", "escapedChars",
+           "Command", "Block", "cprint", "ConstChangedError", "ChickenCode", "floatOrInt", "floatIntOrString",
+           "WARNING", "ERROR"]
 
 symbolCodes = {
     '\t': 'push9\nbbq',
@@ -141,16 +145,16 @@ except ImportError:
     def cprint(_, *args, **kwargs):
         print(*args, **kwargs)
 
-baseCommands = {'AXE':     '',
+baseCommands = {'AXE': '',
                 'CHICKEN': 'chicken',
-                'ADD':     'chicken chicken',
-                'FOX':     'chicken chicken chicken',
+                'ADD': 'chicken chicken',
+                'FOX': 'chicken chicken chicken',
                 'ROOSTER': 'chicken chicken chicken chicken',
                 'COMPARE': 'chicken chicken chicken chicken chicken',
-                'PICK':    'chicken chicken chicken chicken chicken chicken',
-                'PECK':    'chicken chicken chicken chicken chicken chicken chicken',
-                'FR':      'chicken chicken chicken chicken chicken chicken chicken chicken',
-                'BBQ':     'chicken chicken chicken chicken chicken chicken chicken chicken chicken'}
+                'PICK': 'chicken chicken chicken chicken chicken chicken',
+                'PECK': 'chicken chicken chicken chicken chicken chicken chicken',
+                'FR': 'chicken chicken chicken chicken chicken chicken chicken chicken',
+                'BBQ': 'chicken chicken chicken chicken chicken chicken chicken chicken chicken'}
 
 
 class ConstChangedError(Exception):
@@ -275,17 +279,6 @@ class ChickenCode(object):
 
     def __iter__(self):
         return self.code.__iter__()
-
-
-def flatten(a: list) -> list:
-    b = []
-    for i in a:
-        if i is not None:
-            if isinstance(i, list):
-                b += flatten(i)
-            else:
-                b += [i]
-    return b
 
 
 floatOrInt = Union[float, int]

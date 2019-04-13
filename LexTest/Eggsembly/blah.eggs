@@ -2,11 +2,10 @@ const foo = 2^4 / 4
 const bar = 3
 push -foo^bar
 push foo
-push 2 - 2(3 + 1)
+push 2 - 2 * (3 + 1)
 push ((2-1)^bar)^foo
 push foo*bar*foo^2
 push bar*foo*bar*foo
-push (bar(foo(bar(foo))))
 push '3'
 a as b
 x as y
@@ -14,6 +13,7 @@ axe
 chicken
 add
 fox
+hatch a.b
 rooster
 compare
 pick
@@ -56,4 +56,12 @@ repeat_while {
 repeat_until {
    push -1
 }
+
+const a = 3
+let f(x, y) = x^y - y + 2 - g(y)
+let g(x)    = -(2^3 - 4)
+const n = f(1 + 1, 4)
+const x = f(n, 3)
+push f(f(1 + 1, 4), 3)
+
 ~~[====> I wave my sword at thee!
