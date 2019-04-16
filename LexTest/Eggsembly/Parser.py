@@ -8,6 +8,7 @@ __all__ = ["EggParse"]
 
 class EggParse(object):
     """Class for parsing Eggsembly"""
+
     def __init__(self, file, **kwargs):
         self.vars: Dict[str, Union[int, float, str]] = {}
         self.funcs: Dict[str, Block] = {}
@@ -24,7 +25,7 @@ class EggParse(object):
         self.data = self.lexer.data = data
         return self.parser.parse(self.data, lexer=self.lexer.lexer, **kwargs)
 
-    def __str__(self):        # This is what *actually* compiles an Eggsembly program, used after calling the object
+    def __str__(self):  # This is what *actually* compiles an Eggsembly program, used after calling the object
         return str(self.code)
 
     tokens = EggLex.tokens
@@ -45,7 +46,7 @@ class EggParse(object):
         cprint(ERROR, "Syntax error on line %d:\n\t%s" % (self.lexer.lineno,
                                                           self.data.split("\n")[self.lexer.lineno - 1].strip()))
 
-    # The main syntax of the language,
+    # The main syntax of the language
     def p_syntax(self, p):
         """syntax : syntax NEWLINE block
                   | syntax NEWLINE stmt
@@ -53,7 +54,7 @@ class EggParse(object):
                   | stmt
         """
         if len(p) == 4:
-            p[0] = p[1] + (not isinstance(p, list) and [p] or [*p]) if p[3] is not None else p[1]
+            p[0] = p[1] + (not isinstance(p[3], list) and [p[3]] or p[3]) if p[3] is not None else p[1]
         else:
             p[0] = [p[1]] if p[1] is not None else []
 
@@ -150,16 +151,15 @@ class EggParse(object):
 
     def p_stmt_SETCONST(self, p):
         """stmt : CONST ID EQ CONSTVAL"""
-        if p[2] in self.mfuncs:
-            cprint(ERROR, f"Name {p[2]} used for constant and mathematical function, line {self.lexer.lineno}")
-        elif p[2] not in self.consts:
-            if isinstance(p[4], Function):
-                self.mfuncs[p[2]] = p[4]
+        if isinstance(p[4], Function):
+            if p[2] in self.consts:
+                cprint(ERROR, f"Name {p[2]} used for constant and mathematical function, line {self.lexer.lineno}")
             else:
-                self.consts[p[2]] = p[4]
+                self.mfuncs[p[2]] = p[4]
+        elif p[2] not in self.consts:
+            self.consts[p[2]] = p[4]
         else:
             raise ConstChangedError("Constant %r redefined" % p[2])
-
 
     def p_stmt_BLANKLINE(self, p):
         """stmt : """
@@ -185,7 +185,6 @@ class EggParse(object):
             exit()
         else:
             p[0] = p[1]({**self.mfuncs, **self.consts}, p[3])
-
 
     def p_expr_DIV(self, p):
         """mathexpr : mathexpr DIV mathexpr"""
@@ -278,8 +277,16 @@ class EggParse(object):
         else:
             p[0] = Mul(p[1], p[3])
 
+    def p_AST_FUNCCALL_TUP(self, p):
+        """AST : AST LPAREN ASTTUPLE RPAREN
+               | AST LPAREN ASTTUPLE COM RPAREN"""
+        if not isinstance(p[1], Var):
+            cprint(ERROR, f"Invalid call")
+        p[0] = FuncInFunc(p[1].name, p[3], self.lexer.lineno)
+
     def p_AST_FUNCCALL(self, p):
-        """AST : AST LPAREN AST RPAREN"""
+        """AST : AST LPAREN AST RPAREN
+               | AST LPAREN AST COM RPAREN"""
         if not isinstance(p[1], Var):
             cprint(ERROR, f"Invalid call")
         p[0] = FuncInFunc(p[1].name, [p[3]], self.lexer.lineno)
@@ -414,7 +421,7 @@ class EggParse(object):
         p[0] = [p[1], p[3]]
 
     def p_AST_TUPLE_T(self, p):
-        """ASTTUPLE : TUPLE COM AST"""
+        """ASTTUPLE : ASTTUPLE COM AST"""
         p[0] = p[1] + [p[2]]
 
     def p_AST_TUPLE_TF(self, p):
