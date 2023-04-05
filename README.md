@@ -1,5 +1,5 @@
 # Eggsembly
-An interpreter for the Eggsembly language.
+An interpreter for the Eggsembly language. Further work has been moved to [this repo](https://github.com/Beaux44/Eggsembly-lang).
 
 ## FAQ
 ### What is Eggsembly?
